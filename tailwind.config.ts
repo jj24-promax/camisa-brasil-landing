@@ -91,25 +91,8 @@ const config: Config = {
         "accordion-up": {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
-        },think
-The user is pointing out that the previous response was cut off. I need to complete the `tailwind.config.ts` file and then proceed with the other requested changes (shrinking images/cards and adding the promo section).
-
-Looking at the previous output:
-The last block was `tailwind.config.ts` and it ended at `from: { height: "var(--radix-accordion-content-height)" },`.
-
-I will finish that file and then update the components.
-
-Changes needed:
-1. Complete `tailwind.config.ts`.
-2. Update `src/components/landing/hero-section.tsx`: Increase text sizes, shrink the product card/slider.
-3. Update `src/components/landing/product-details.tsx`: Increase text sizes, shrink the image.
-4. Update `src/components/landing/premium-gallery.tsx`: Increase text sizes, shrink the gallery container.
-5. Create a new `PromoSection` for the "Buy 2 Get 3" image and insert it into `src/app/page.tsx`.
-6. Update `src/components/landing/social-proof.tsx`: Increase text sizes, shrink the marquee cards.
-7. Update `src/components/landing/faq-section.tsx`: Increase text sizes.
-8. Update `src/components/landing/size-chart.tsx`: Increase text sizes.
-
-Let's start by completing the config and then the components."scroll-x": {
+        },
+        "scroll-x": {
           from: { transform: "translateX(0)" },
           to: { transform: "translateX(-50%)" },
         },
