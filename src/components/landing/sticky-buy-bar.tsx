@@ -4,12 +4,13 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { PRODUCT } from "@/lib/product";
+import { ShoppingCart } from "lucide-react";
 
 type StickyBuyBarProps = {
-  onBuy: () => void;
+  onAddToCart: () => void;
 };
 
-export function StickyBuyBar({ onBuy }: StickyBuyBarProps) {
+export function StickyBuyBar({ onAddToCart }: StickyBuyBarProps) {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -42,8 +43,9 @@ export function StickyBuyBar({ onBuy }: StickyBuyBarProps) {
                   {PRODUCT.priceFormatted}
                 </p>
               </div>
-              <Button size="lg" className="shrink-0 px-7 text-[11px]" onClick={onBuy}>
-                Comprar
+              <Button size="lg" className="shrink-0 px-5 text-[11px]" onClick={onAddToCart}>
+                <ShoppingCart className="mr-2 h-4 w-4" />
+                Adicionar
               </Button>
             </div>
           </div>

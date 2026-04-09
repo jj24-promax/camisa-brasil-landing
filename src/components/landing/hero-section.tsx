@@ -4,28 +4,22 @@ import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion
 import { useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { LuxuryProductSlider } from "@/components/ui/luxury-product-slider";
-import { PRODUCT, SIZES, HERO_PRODUCT_SLIDES, type Size } from "@/lib/product";
+import { PRODUCT, SIZES, HERO_PRODUCT_SLIDES } from "@/lib/product";
+import type { Size } from "@/lib/types";
 import { useMobileParallaxOff } from "@/hooks/use-is-mobile-parallax";
 import { cn } from "@/lib/utils";
-
-/** Prova social de lançamento — próxima ao CTA */
-const launchProof = [
-  "Edição limitada",
-  "Lançamento exclusivo",
-  "Envio rápido",
-  "Pix",
-] as const;
+import { ShoppingCart } from "lucide-react";
 
 type HeroSectionProps = {
   selectedSize: Size;
   onSizeChange: (s: Size) => void;
-  onBuy: () => void;
+  onAddToCart: () => void;
 };
 
 export function HeroSection({
   selectedSize,
   onSizeChange,
-  onBuy,
+  onAddToCart,
 }: HeroSectionProps) {
   const sectionRef = useRef<HTMLElement>(null);
   const mobileOff = useMobileParallaxOff();
@@ -111,77 +105,51 @@ export function HeroSection({
             <div className="relative overflow-hidden rounded-[1.65rem] border border-white/[0.07] bg-[linear-gradient(165deg,rgba(255,255,255,0.045)_0%,rgba(255,255,255,0.01)_45%,transparent_100%)] p-6 shadow-luxe backdrop-blur-xl md:rounded-[1.85rem] md:p-8">
               <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" />
 
-              {/* Microcopy de lançamento */}
-              <div className="mb-7 flex flex-wrap justify-center gap-2 sm:justify-start">
-                {launchProof.map((label) => (
-                  <span
-                    key={label}
-                    className="rounded-full border border-white/[0.08] bg-white/[0.03] px-2.5 py-1 font-sans text-[9px] font-medium uppercase tracking-[0.22em] text-[hsl(215,14%,58%)]"
-                  >
-                    {label}
-                  </span>
-                ))}
-              </div>
-
-              <div className="flex flex-col gap-9 sm:flex-row sm:items-end sm:justify-between sm:gap-10">
-                <div className="text-center sm:text-left">
-                  <p className="font-sans text-[10px] font-medium uppercase tracking-[0.3em] text-[hsl(215,14%,48%)]">
-                    Investimento
-                  </p>
-                  <p className="mt-2 font-display text-[clamp(2rem,4.5vw,2.75rem)] font-semibold tabular-nums tracking-[-0.02em] text-[hsl(42,38%,74%)]">
-                    {PRODUCT.priceFormatted}
-                  </p>
-                </div>
-                <div className="flex-1 sm:min-w-0">
-                  <p className="mb-3 text-left font-sans text-[10px] font-medium uppercase tracking-[0.3em] text-[hsl(215,14%,48%)]">
-                    Tamanho
-                  </p>
-                  <div className="flex flex-wrap justify-center gap-2 sm:justify-start">
-                    {SIZES.map((s) => (
-                      <button
-                        key={s}
-                        type="button"
-                        onClick={() => onSizeChange(s)}
-                        className={cn(
-                          "relative min-h-[2.85rem] min-w-[2.85rem] overflow-hidden rounded-xl text-[0.8125rem] font-medium tracking-[0.06em] transition-all duration-300",
-                          selectedSize === s
-                            ? "text-[hsl(222,44%,6%)] shadow-gold-soft"
-                            : "border border-white/[0.09] bg-white/[0.025] text-[hsl(215,14%,62%)] hover:border-gold/30 hover:text-[hsl(210,25%,92%)]"
-                        )}
-                      >
-                        {selectedSize === s && (
-                          <span className="absolute inset-0 bg-gold-shine" />
-                        )}
-                        <span className="relative z-10">{s}</span>
-                      </button>
-                    ))}
+              <div className="flex flex-col gap-6">
+                <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between sm:gap-10">
+                  <div className="text-center sm:text-left">
+                    <p className="font-sans text-[10px] font-medium uppercase tracking-[0.3em] text-[hsl(215,14%,48%)]">
+                      Preço
+                    </p>
+                    <p className="mt-2 font-display text-[clamp(2rem,4.5vw,2.75rem)] font-semibold tabular-nums tracking-[-0.02em] text-[hsl(42,38%,74%)]">
+                      {PRODUCT.priceFormatted}
+                    </p>
+                  </div>
+                  <div className="flex-1 sm:min-w-0">
+                    <p className="mb-3 text-center font-sans text-[10px] font-medium uppercase tracking-[0.3em] text-[hsl(215,14%,48%)] sm:text-left">
+                      Tamanho
+                    </p>
+                    <div className="flex flex-wrap justify-center gap-2 sm:justify-start">
+                      {SIZES.map((s) => (
+                        <button
+                          key={s}
+                          type="button"
+                          onClick={() => onSizeChange(s)}
+                          className={cn(
+                            "relative min-h-[2.85rem] min-w-[2.85rem] overflow-hidden rounded-xl text-[0.8125rem] font-medium tracking-[0.06em] transition-all duration-300",
+                            selectedSize === s
+                              ? "text-[hsl(222,44%,6%)] shadow-gold-soft"
+                              : "border border-white/[0.09] bg-white/[0.025] text-[hsl(215,14%,62%)] hover:border-gold/30 hover:text-[hsl(210,25%,92%)]"
+                          )}
+                        >
+                          {selectedSize === s && (
+                            <span className="absolute inset-0 bg-gold-shine" />
+                          )}
+                          <span className="relative z-10">{s}</span>
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="my-8 h-px w-full bg-gradient-to-r from-transparent via-white/[0.1] to-transparent" />
-
-              <div className="flex flex-col gap-5">
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-stretch sm:gap-3">
-                  <Button
-                    size="xl"
-                    className="w-full min-w-0 sm:min-w-[15rem] sm:flex-1"
-                    onClick={onBuy}
-                  >
-                    Garantir minha peça
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="lg"
-                    className="w-full normal-case text-[0.8125rem] font-medium tracking-[0.1em] sm:w-auto sm:min-w-[11rem]"
-                    asChild
-                  >
-                    <a href="#galeria">Ver detalhes</a>
-                  </Button>
-                </div>
-                <p className="text-center font-sans text-[11px] leading-relaxed tracking-[0.04em] text-[hsl(215,12%,48%)] sm:text-left">
-                  Lançamento exclusivo · peças restritas à leva atual · envio ágil após confirmação
-                </p>
+                <Button
+                  size="xl"
+                  className="w-full"
+                  onClick={onAddToCart}
+                >
+                  <ShoppingCart className="mr-2.5 h-4 w-4" />
+                  Adicionar ao carrinho
+                </Button>
               </div>
             </div>
           </motion.div>

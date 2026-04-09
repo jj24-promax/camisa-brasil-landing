@@ -4,12 +4,13 @@ import { Button } from "@/components/ui/button";
 import { PRODUCT } from "@/lib/product";
 import { ParallaxBg } from "@/components/landing/parallax-bg";
 import { SectionReveal, SectionShell } from "@/components/landing/section-shell";
+import { ShoppingCart } from "lucide-react";
 
 type FinalCtaProps = {
-  onBuy: () => void;
+  onAddToCart: () => void;
 };
 
-export function FinalCta({ onBuy }: FinalCtaProps) {
+export function FinalCta({ onAddToCart }: FinalCtaProps) {
   return (
     <SectionShell
       aria-labelledby="final-cta-heading"
@@ -58,8 +59,9 @@ export function FinalCta({ onBuy }: FinalCtaProps) {
                 {PRODUCT.priceFormatted}
               </p>
             </div>
-            <Button size="xl" onClick={onBuy} className="transition-transform duration-300 hover:scale-[1.02] active:scale-[0.99]">
-              Comprar agora
+            <Button size="xl" onClick={onAddToCart} className="transition-transform duration-300 hover:scale-[1.02] active:scale-[0.99]">
+              <ShoppingCart className="mr-2.5 h-5 w-5" />
+              Adicionar ao carrinho
             </Button>
           </div>
         </div>

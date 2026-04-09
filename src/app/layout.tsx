@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { DM_Sans, Syne } from "next/font/google";
 import { AmbientBackground } from "@/components/landing/ambient-background";
+import { Toaster } from "@/components/ui/toaster";
 import "./globals.css";
 
 const sans = DM_Sans({
@@ -55,6 +56,7 @@ export default function RootLayout({
       >
         <AmbientBackground />
         <div className="relative z-10 flex min-h-[100dvh] flex-col">{children}</div>
+        <Toaster />
       </body>
     </html>
   );

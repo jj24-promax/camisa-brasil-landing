@@ -31,13 +31,14 @@ const benefits = [
   },
 ];
 
-export function ProductSpotlight() {
+export function ProductDetails() {
   return (
     <SectionShell
-      id="sobre"
-      aria-labelledby="spotlight-heading"
+      id="detalhes"
+      aria-labelledby="details-heading"
       variant="default"
       grain="low"
+      className="scroll-mt-24"
       backgroundSlot={
         <ParallaxBg className="opacity-[0.45]">
           <div className="h-full w-full bg-[radial-gradient(ellipse_70%_55%_at_15%_40%,hsl(38_30%_12%/0.28),transparent)]" />
@@ -47,7 +48,6 @@ export function ProductSpotlight() {
       <SectionSplit>
         <div className="relative z-[3] grid gap-14 lg:grid-cols-12 lg:items-start lg:gap-10 xl:gap-16">
           <div className="relative lg:col-span-5 xl:col-span-5">
-            {/* Transição vertical mobile entre blocos */}
             <div
               className="pointer-events-none mb-10 h-px w-full bg-gradient-to-r from-transparent via-white/[0.08] to-transparent lg:mb-0 lg:hidden"
               aria-hidden
@@ -58,7 +58,7 @@ export function ProductSpotlight() {
                 Olhar de stylist
               </p>
               <h2
-                id="spotlight-heading"
+                id="details-heading"
                 className="mt-5 font-display text-[clamp(2rem,4vw,3.25rem)] font-bold leading-[1.08] tracking-tight text-balance text-foreground"
               >
                 Feita para{" "}
