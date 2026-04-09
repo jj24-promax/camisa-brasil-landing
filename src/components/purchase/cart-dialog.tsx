@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import type { CartItem } from "@/lib/types";
-import { Minus, Plus, ShoppingCart, Trash2 } from "lucide-react";
+import { Minus, Plus, ShoppingCart, Trash2, TicketPercent } from "lucide-react";
 
 type CartDialogProps = {
   open: boolean;
@@ -31,21 +31,34 @@ export function CartDialog({
 }: CartDialogProps) {
   const router = useRouter();
   
-  const totalCents = useMemo(
+  const totalQuantity = useMemo(() => items.reduce((sum, item) => sum + item.quantity, 0), [items]);
+  
+  const subtotalCents = useMemo(
     () => items.reduce((sum, item) => sum + item.priceCents * item.quantity, 0),
     [items]
   );
 
-  const totalFormatted = useMemo(() => {
+  // Lógica: A cada 3 camisas, 1 sai de graça (Leve 3, Pague 2)
+  const discountCents = useMemo(() => {
+    const freeItems = Math.floor(totalQuantity / 3);
+    if (items.length === 0 || freeItems === 0) return 0;
+    // Usamos o preço do primeiro item como base (já que todos custam 69 no momento)
+    return freeItems * items[0].priceCents;
+  }, [totalQuantity, items]);
+
+  const totalCents = subtotalCents - discountCents;
+
+  const formatCurrency = (cents: number) => {
     return new Intl.NumberFormat("pt-BR", {
       style: "currency",
       currency: "BRL",
-    }).format(totalCents / 100);
-  }, [totalCents]);
+    }).format(cents / 100);
+  };
 
   const onCheckout = () => {
     onOpenChange(false);
-    router.push("/checkout");
+    // Passamos a quantidade no link para o checkout estático refletir o desconto
+    router.push(`/checkout?q=${totalQuantity}`);
   };
 
   return (
@@ -134,12 +147,23 @@ export function CartDialog({
             <div className="space-y-3 rounded-2xl border border-white/[0.08] bg-gradient-to-br from-gold/[0.07] via-transparent to-transparent p-5 shadow-luxe">
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">Subtotal</span>
-                <span className="tabular-nums text-foreground">{totalFormatted}</span>
+                <span className="tabular-nums text-foreground">{formatCurrency(subtotalCents)}</span>
               </div>
+              
+              {discountCents > 0 && (
+                <div className="flex items-center justify-between text-sm text-green-500">
+                  <span className="flex items-center gap-1.5 font-bold">
+                    <TicketPercent size={14} />
+                    Oferta Leve 3 Pague 2
+                  </span>
+                  <span className="font-bold tabular-nums">- {formatCurrency(discountCents)}</span>
+                </div>
+              )}
+
               <div className="flex items-center justify-between border-t border-white/10 pt-3">
                 <span className="font-display text-base font-semibold">Total</span>
                 <span className="font-display text-lg font-bold tabular-nums text-gold-bright">
-                  {totalFormatted}
+                  {formatCurrency(totalCents)}
                 </span>
               </div>
             </div>

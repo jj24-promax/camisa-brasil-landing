@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { motion } from "framer-motion";
-import { ChevronLeft, Lock, ShieldCheck, CreditCard, QrCode, Truck, Star } from "lucide-react";
+import { useSearchParams } from "next/navigation";
+import { ChevronLeft, Lock, ShieldCheck, CreditCard, QrCode, Truck, Star, TicketPercent } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PRODUCT, PRODUCT_IMAGE_MAIN_SRC } from "@/lib/product";
 import { cn } from "@/lib/utils";
@@ -31,10 +31,33 @@ const InputGroup = ({ label, placeholder, type = "text", className }: { label: s
 
 export default function CheckoutPage() {
   const [paymentMethod, setPaymentMethod] = useState<"pix" | "card">("pix");
+  const searchParams = useSearchParams();
+  
+  // Pegamos a quantidade da URL para simular o estado do carrinho nesta demonstração
+  const quantity = parseInt(searchParams.get("q") || "3", 10);
+  
+  const pricing = useMemo(() => {
+    const unitPrice = PRODUCT.priceCents;
+    const subtotal = unitPrice * quantity;
+    const freeItems = Math.floor(quantity / 3);
+    const discount = freeItems * unitPrice;
+    const total = subtotal - discount;
+
+    const format = (cents: number) => 
+      new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(cents / 100);
+
+    return {
+      subtotal: format(subtotal),
+      discount: format(discount),
+      discountValue: discount,
+      total: format(total),
+      quantity,
+      freeItems
+    };
+  }, [quantity]);
 
   return (
     <div className="min-h-screen bg-[#04070d] text-foreground pb-20">
-      {/* Banner de Oferta */}
       <div className="bg-gradient-to-r from-red-600 to-orange-600 py-1.5 text-center">
         <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-white">
           🔥 Oferta por tempo limitado! Frete Grátis Ativado.
@@ -56,23 +79,20 @@ export default function CheckoutPage() {
 
       <main className="mx-auto mt-8 max-w-7xl px-5 lg:mt-12">
         <div className="grid gap-8 lg:grid-cols-[1fr_400px]">
-          {/* Coluna Esquerda: Formulários */}
           <div className="space-y-8">
-            {/* Header de Produto (Mobile) */}
             <div className="lg:hidden glass-dark overflow-hidden rounded-2xl p-4 flex gap-4">
               <div className="relative h-20 w-16 shrink-0 overflow-hidden rounded-lg">
                 <Image src={PRODUCT_IMAGE_MAIN_SRC} alt={PRODUCT.name} fill className="object-cover" />
               </div>
               <div className="flex flex-col justify-center">
-                <h3 className="text-sm font-bold text-white">{PRODUCT.name}</h3>
+                <h3 className="text-sm font-bold text-white">{pricing.quantity}x {PRODUCT.name}</h3>
                 <div className="mt-1 flex gap-0.5">
                    {[...Array(5)].map((_, i) => <Star key={i} className="h-2.5 w-2.5 fill-gold text-gold" />)}
                 </div>
-                <p className="mt-1 text-lg font-bold text-gold-bright">{PRODUCT.priceFormatted}</p>
+                <p className="mt-1 text-lg font-bold text-gold-bright">{pricing.total}</p>
               </div>
             </div>
 
-            {/* Passo 1: Dados Pessoais */}
             <section className="glass-dark rounded-[2rem] p-6 md:p-8">
               <SectionHeader number={1} title="Dados Pessoais" />
               <div className="grid gap-4 md:grid-cols-2">
@@ -83,7 +103,6 @@ export default function CheckoutPage() {
               </div>
             </section>
 
-            {/* Passo 2: Endereço de Entrega */}
             <section className="glass-dark rounded-[2rem] p-6 md:p-8">
               <SectionHeader number={2} title="Endereço de Entrega" />
               <div className="grid gap-4 md:grid-cols-3">
@@ -96,10 +115,8 @@ export default function CheckoutPage() {
               </div>
             </section>
 
-            {/* Passo 3: Pagamento */}
             <section className="glass-dark rounded-[2rem] p-6 md:p-8">
               <SectionHeader number={3} title="Pagamento" />
-              
               <div className="grid grid-cols-2 gap-3 mb-8">
                 <button 
                   onClick={() => setPaymentMethod("pix")}
@@ -154,9 +171,8 @@ export default function CheckoutPage() {
                   <div className="flex flex-col gap-1.5">
                     <label className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground pl-1">Parcelas</label>
                     <select className="h-12 w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 text-sm text-white focus:border-gold/50 focus:outline-none focus:ring-1 focus:ring-gold/50">
-                      <option>1x de {PRODUCT.priceFormatted} sem juros</option>
-                      <option>2x de R$ 34,50 sem juros</option>
-                      <option>3x de R$ 23,00 sem juros</option>
+                      <option>1x de {pricing.total} sem juros</option>
+                      <option>Até 12x no cartão</option>
                     </select>
                   </div>
                 </div>
@@ -164,24 +180,26 @@ export default function CheckoutPage() {
             </section>
           </div>
 
-          {/* Coluna Direita: Resumo (Sticky no Desktop) */}
           <aside className="lg:sticky lg:top-24 h-fit">
             <div className="glass-dark rounded-[2rem] p-6 md:p-8">
               <h3 className="font-display text-lg font-bold uppercase tracking-tight text-white mb-6">Resumo do Pedido</h3>
               
               <div className="space-y-4 mb-8">
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Produto</span>
-                  <span className="text-white font-medium">{PRODUCT.shortName} (Tam: M)</span>
+                  <span className="text-muted-foreground">Produtos ({pricing.quantity} itens)</span>
+                  <span className="text-white font-medium">{pricing.subtotal}</span>
                 </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Preço Original</span>
-                  <span className="text-muted-foreground line-through">R$ 149,00</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground font-semibold text-green-500">Desconto (-54%)</span>
-                  <span className="text-green-500 font-bold">- R$ 80,00</span>
-                </div>
+                
+                {pricing.discountValue > 0 && (
+                  <div className="flex justify-between text-sm">
+                    <div className="flex items-center gap-1.5 text-green-500 font-bold">
+                      <TicketPercent size={14} />
+                      Oferta Leve 3 Pague 2
+                    </div>
+                    <span className="text-green-500 font-bold">- {pricing.discount}</span>
+                  </div>
+                )}
+
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Frete</span>
                   <span className="text-green-500 font-bold uppercase tracking-widest text-[10px]">Grátis</span>
@@ -189,7 +207,7 @@ export default function CheckoutPage() {
                 <div className="h-px bg-white/10 my-6" />
                 <div className="flex justify-between items-end">
                   <span className="font-display text-lg font-bold text-white uppercase tracking-tight">Total</span>
-                  <span className="font-display text-3xl font-bold text-gold-bright tracking-tight">{PRODUCT.priceFormatted}</span>
+                  <span className="font-display text-3xl font-bold text-gold-bright tracking-tight">{pricing.total}</span>
                 </div>
               </div>
 
