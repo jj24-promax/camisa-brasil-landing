@@ -13,6 +13,7 @@ import { FinalCta } from "@/components/landing/final-cta";
 import { StickyBuyBar } from "@/components/landing/sticky-buy-bar";
 import { SiteNavDesktop, SiteNavMobile, CartButton } from "@/components/landing/site-nav";
 import { AnnouncementBar } from "@/components/landing/announcement-bar";
+import { SalesNotifications } from "@/components/landing/sales-notifications";
 import { CartDialog } from "@/components/purchase/cart-dialog";
 import { PRODUCT, PRODUCT_IMAGE_SRC } from "@/lib/product";
 import type { Size, CartItem } from "@/lib/types";
@@ -111,6 +112,7 @@ export default function HomePage() {
       </footer>
 
       <StickyBuyBar onAddToCart={handleAddToCart} />
+      <SalesNotifications />
       <CartDialog
         open={cartOpen}
         onOpenChange={setCartOpen}
