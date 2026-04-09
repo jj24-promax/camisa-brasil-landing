@@ -162,7 +162,7 @@ export default function CheckoutPage() {
 
   const handleFinalize = () => {
     if (paymentMethod === "card") {
-      toast.error("Sistema de Cartão indisponível, refaça a compra via Pix por gentileza!", {
+      toast.error("Sistema de Cartão Indisponível, Refaça a Compra via Pix, Por Gentileza!", {
         duration: 5000,
         icon: '⚠️',
         style: {
