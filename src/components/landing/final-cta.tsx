@@ -59,7 +59,7 @@ export function FinalCta({ onAddToCart }: FinalCtaProps) {
                 {PRODUCT.priceFormatted}
               </p>
             </div>
-            <Button size="xl" onClick={onAddToCart} className="transition-transform duration-300 hover:scale-[1.02] active:scale-[0.99]">
+            <Button size="xl" onClick={onAddToCart} className="transition-transform duration-300 hover:scale-[1.02] active:scale-[0.99] font-bold uppercase tracking-tight">
               <ShoppingCart className="mr-2.5 h-5 w-5" />
               Adicionar ao carrinho
             </Button>

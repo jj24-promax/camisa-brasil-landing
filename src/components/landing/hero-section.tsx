@@ -127,10 +127,10 @@ export function HeroSection({
 
                 <Button 
                   size="xl" 
-                  className="shimmer-btn w-full text-base font-bold uppercase tracking-widest shadow-[0_0_30px_-5px_hsl(var(--gold)/0.4)]" 
+                  className="shimmer-btn w-full text-sm sm:text-base font-bold uppercase tracking-tight sm:tracking-normal shadow-[0_0_30px_-5px_hsl(var(--gold)/0.4)]" 
                   onClick={onAddToCart}
                 >
-                  <ShoppingCart className="mr-3 h-5 w-5" />
+                  <ShoppingCart className="mr-3 h-5 w-5 shrink-0" />
                   Garantir minha Edição Sagrada
                 </Button>
               </div>
