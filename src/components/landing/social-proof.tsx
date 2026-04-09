@@ -1,36 +1,58 @@
 "use client";
 
 import Image from "next/image";
-import { motion } from "framer-motion";
 import { Star } from "lucide-react";
 import { SectionReveal, SectionShell } from "@/components/landing/section-shell";
-import { SECTION_STAGGER } from "@/hooks/use-section-motion";
 import { cn } from "@/lib/utils";
 
 const reviews = [
   {
     name: "Rafael M.",
-    city: "São Paulo, SP",
-    text: "Acabamento impecável. Parece peça de coleção — uso e recebo elogio toda vez.",
+    text: "Acabamento impecável. Parece peça de coleção.",
     rating: 5,
-    imageSrc: "/images/testimonials/1.png",
     profileImageSrc: "/images/testimonials/profiles/1.jpg",
   },
   {
     name: "Juliana C.",
-    city: "Curitiba, PR",
-    text: "O caimento valoriza demais. Cor vibrante sem parecer carnival kitsch.",
+    text: "O caimento valoriza demais. Cor vibrante na medida.",
     rating: 5,
-    imageSrc: "/images/testimonials/2.png",
     profileImageSrc: "/images/testimonials/profiles/2.jpg",
   },
   {
     name: "Diego A.",
-    city: "Belo Horizonte, MG",
-    text: "Leve, confortável e com presença forte. Virou minha camisa favorita.",
+    text: "Leve, confortável e com presença. Virou minha favorita.",
     rating: 5,
-    imageSrc: "/images/testimonials/3.png",
     profileImageSrc: "/images/testimonials/profiles/3.jpg",
+  },
+  {
+    name: "Beatriz L.",
+    text: "Qualidade surpreendente pelo preço. Recomendo!",
+    rating: 5,
+    profileImageSrc: "/images/testimonials/profiles/6.jpg",
+  },
+  {
+    name: "Lucas S.",
+    text: "Design moderno, foge do óbvio. Chegou rápido.",
+    rating: 5,
+    profileImageSrc: "/images/testimonials/profiles/4.jpg",
+  },
+  {
+    name: "Fernanda O.",
+    text: "A estampa é muito mais bonita ao vivo. Amei!",
+    rating: 5,
+    profileImageSrc: "/images/testimonials/profiles/7.jpg",
+  },
+  {
+    name: "Carlos E.",
+    text: "Material de primeira, não esquenta. Ótima compra.",
+    rating: 5,
+    profileImageSrc: "/images/testimonials/profiles/5.jpg",
+  },
+  {
+    name: "Mariana P.",
+    text: "Veste super bem, modelagem perfeita. Comprarei de novo.",
+    rating: 5,
+    profileImageSrc: "/images/testimonials/profiles/8.jpg",
   },
 ];
 
@@ -72,54 +94,43 @@ export function SocialProof() {
         </p>
       </SectionReveal>
 
-      <div className="mt-16 grid gap-6 md:grid-cols-3 md:gap-8">
-        {reviews.map((r, i) => (
-          <motion.figure
-            key={r.name}
-            initial={{ opacity: 0, y: 14 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{
-              delay: i * SECTION_STAGGER,
-              duration: 0.4,
-              ease: [0.22, 1, 0.36, 1],
-            }}
-            className="glass-dark group relative flex flex-col overflow-hidden rounded-2xl border border-white/[0.05] p-0 transition-all duration-300 hover:border-white/[0.12] hover:shadow-luxe-hover"
-          >
-            <div className="relative aspect-[4/5] w-full overflow-hidden">
-              <Image
-                src={r.imageSrc}
-                alt={`Foto do depoimento de ${r.name}`}
-                fill
-                className="object-cover transition-transform duration-500 group-hover:scale-105"
-                sizes="(max-width: 768px) 100vw, 33vw"
-              />
-            </div>
-            <div className="flex flex-1 flex-col p-6 md:p-7">
-              <Stars n={r.rating} />
-              <blockquote className="relative z-10 mt-4 text-[15px] leading-relaxed text-foreground/95">
-                {r.text}
-              </blockquote>
-              <figcaption className="mt-auto flex items-center gap-4 border-t border-white/[0.05] pt-5">
-                <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full">
+      <div
+        className="group relative mt-16 w-full overflow-hidden"
+        style={{
+          maskImage: "linear-gradient(to right, transparent, black 10%, black 90%, transparent)",
+          WebkitMaskImage:
+            "linear-gradient(to right, transparent, black 10%, black 90%, transparent)",
+        }}
+      >
+        <div className="flex min-w-max animate-scroll-x gap-6 group-hover:[animation-play-state:paused] md:gap-8">
+          {[...reviews, ...reviews].map((r, i) => (
+            <figure
+              key={`${r.name}-${i}`}
+              className="glass-dark w-[300px] shrink-0 rounded-2xl p-6 transition-all duration-300 hover:!border-white/[0.12] hover:!shadow-luxe-hover md:w-[340px]"
+            >
+              <div className="flex items-center gap-4">
+                <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full">
                   <Image
                     src={r.profileImageSrc}
                     alt={`Foto de perfil de ${r.name}`}
                     fill
                     className="object-cover"
-                    sizes="40px"
+                    sizes="48px"
                   />
                 </div>
                 <div>
                   <p className="font-display text-sm font-semibold tracking-tight">{r.name}</p>
-                  <p className="mt-1 text-xs uppercase tracking-[0.2em] text-muted-foreground">
-                    {r.city}
-                  </p>
+                  <div className="mt-1">
+                    <Stars n={r.rating} />
+                  </div>
                 </div>
-              </figcaption>
-            </div>
-          </motion.figure>
-        ))}
+              </div>
+              <blockquote className="relative z-10 mt-4 text-[15px] leading-relaxed text-foreground/95">
+                {r.text}
+              </blockquote>
+            </figure>
+          ))}
+        </div>
       </div>
     </SectionShell>
   );
