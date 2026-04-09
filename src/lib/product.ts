@@ -38,6 +38,10 @@ export const PRODUCT_IMAGE_DETAIL_SRC =
 export const PRODUCT_IMAGE_GALLERY_MACRO_SRC =
   "/images/camisa-galeria-detalhe-macro.png" as const;
 
+/** Nova foto de detalhes macro (v2). */
+export const PRODUCT_IMAGE_GALLERY_MACRO_V2_SRC =
+  "/images/camisa-detalhes-macro-v2.png" as const;
+
 /** Resumo do pedido — alinhado à arte principal de marketing. */
 export const PRODUCT_IMAGE_SRC = PRODUCT_IMAGE_MAIN_SRC;
 
@@ -66,6 +70,10 @@ export const GALLERY_IMAGES = [
     mp4Src: GALLERY_DETAIL_VIDEO_MP4_SRC,
     posterSrc: PRODUCT_IMAGE_DETAIL_SRC,
     alt: "Camisa do Brasil estilizada — vídeo da peça; vista frontal com Cristo Redentor em navy e número 10",
+  },
+  {
+    src: PRODUCT_IMAGE_GALLERY_MACRO_V2_SRC,
+    alt: "Detalhes ampliados da edição limitada: gola com selo Rio de Janeiro e bordados de alta precisão",
   },
 ] as const;
 
