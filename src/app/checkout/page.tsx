@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -12,14 +12,6 @@ import {
   CreditCard, 
   QrCode, 
   Truck, 
-  Star, 
-  TicketPercent, 
-  PenTool, 
-  Gift, 
-  ShieldAlert, 
-  Users, 
-  Award, 
-  Key,
   Check,
   Timer,
   Mail,
@@ -29,184 +21,7 @@ import { Button } from "@/components/ui/button";
 import { PRODUCT } from "@/lib/product";
 import { cn } from "@/lib/utils";
 
-// Funções de máscara
-const maskCPF = (value: string) => {
-  return value
-    .replace(/\D/g, "")
-    .replace(/(\d{3})(\d)/, "$1.$2")
-    .replace(/(\d{3})(\d)/, "$1.$2")
-    .replace(/(\d{3})(\d{1,2})/, "$1-$2")
-    .replace(/(-\d{2})\d+?$/, "$1");
-};
-
-const maskPhone = (value: string) => {
-  return value
-    .replace(/\D/g, "")
-    .replace(/(\d{2})(\d)/, "($1) $2")
-    .replace(/(\d{5})(\d)/, "$1-$2")
-    .replace(/(-\d{4})\d+?$/, "$1");
-};
-
-const maskCEP = (value: string) => {
-  return value
-    .replace(/\D/g, "")
-    .replace(/(\d{5})(\d)/, "$1-$2")
-    .replace(/(-\d{3})\d+?$/, "$1");
-};
-
-const maskCardNumber = (value: string) => {
-  return value
-    .replace(/\D/g, "")
-    .replace(/(\d{4})(\d)/, "$1 $2")
-    .replace(/(\d{4})(\d)/, "$1 $2")
-    .replace(/(\d{4})(\d)/, "$1 $2")
-    .replace(/(\d{4})\d+?$/, "$1");
-};
-
-const maskExpiry = (value: string) => {
-  return value
-    .replace(/\D/g, "")
-    .replace(/(\d{2})(\d)/, "$1/$2")
-    .replace(/(\/\d{2})\d+?$/, "$1");
-};
-
-const SectionHeader = ({ number, title }: { number: number; title: string }) => (
-  <div className="flex items-center gap-3 mb-6">
-    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gold text-navy<dyad-write path="src/app/checkout/page.tsx" description="Fixing syntax error and completing the checkout page implementation.">-deep font-bold text-sm">
-      {number}
-    </div>
-    <h2 className="font-display text-lg font-bold uppercase tracking-tight text-white">{title}</h2>
-  </div>
-);
-
-const InputGroup = ({ 
-  label, 
-  placeholder, 
-  type = "text", 
-  className, 
-  value, 
-  onChange,
-  maxLength,
-  icon: Icon
-}: { 
-  label: string; 
-  placeholder: string; 
-  type?: string; 
-  className?: string;
-  value?: string;
-  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  maxLength?: number;
-  icon?: any;
-}) => (
-  <div className={cn("flex flex-col gap-1.5", className)}>
-    <label className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground pl-1">{label}</label>
-    <div className="relative">
-      {Icon && <Icon className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/40" />}
-      <input 
-        type={type}
-        placeholder={placeholder}
-        value={value}
-        onChange={onChange}
-        maxLength={maxLength}
-        className={cn(
-          "h-12 w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 text-sm text-white placeholder:text-muted-foreground/40 focus:border-gold/50 focus:outline-none focus:ring-1 focus:ring-gold/50 transition-all",
-          Icon && "pl-11"
-        )}
-      />
-    </div>
-  </div>
-);
-
-const ORDER_BUMPS = [
-  { 
-    id: "personalization", 
-    title: "Personalização Nome + Número", 
-    offer: "Fonte oficial da edição nas costas da camisa.", 
-    priceCents: 2990, 
-    image: "/images/bumps/name.png" 
-  },
-  { 
-    id: "second_shirt", 
-    title: "Leve a 2ª para Presente", 
-    offer: "Com embrulho incluso. Ideal para irmão ou pai.", 
-    priceCents: 4900, 
-    image: "/images/bumps/shirt.png" 
-  },
-  { 
-    id: "patch", 
-    title: "Patch de Campeão Premium", 
-    offer: "Acabamento em veludo e dourado na manga.", 
-    priceCents: 1290, 
-    image: "/images/bumps/patch.png" 
-  },
-  { 
-    id: "luxury_box", 
-    title: "Embalagem Alpha Collector", 
-    offer: "Caixa premium com hot-stamping e papel seda.", 
-    priceCents: 1990, 
-    image: "/images/bumps/box.png" 
-  },
-  { 
-    id: "keychain", 
-    title: "Chaveiro Réplica Escudo", 
-    offer: "Metal polido banhado a ouro.", 
-    priceCents: 990, 
-    image: "/images/bumps/keychain.png" 
-  },
-  { 
-    id: "shipping_insurance", 
-    title: "Entrega Blindada", 
-    offer: "Proteção total e prioridade máxima no despacho.", 
-    priceCents: 990, 
-    image: "/images/bumps/insurance.png" 
-  },
-];
-
-export default function CheckoutPage() {
-  const [paymentMethod, setPaymentMethod] = useState<"pix" | "card">("pix");
-  const [selectedBumps, setSelectedBumps] = useState<string[]>([]);
-  const [timeLeft, setTimeLeft] = useState(899); // 14:59
-  
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    confirmEmail: "",
-    phone: "",
-    cpf: "",
-    cep: "",
-    city: "",<dyad-write path="src/app/checkout/page.tsx" description="Restaurando o arquivo de checkout completo e corrigido, com todos os elementos de conversão e orderbumps.">
-"use client";
-
-import React, { useState, useMemo, useEffect } from "react";
-import Image from "next/image";
-import Link from "next/link";
-import { useSearchParams } from "next/navigation";
-import toast from "react-hot-toast";
-import { 
-  ChevronLeft, 
-  Lock, 
-  ShieldCheck, 
-  CreditCard, 
-  QrCode, 
-  Truck, 
-  Star, 
-  TicketPercent, 
-  PenTool, 
-  Gift, 
-  ShieldAlert, 
-  Users, 
-  Award, 
-  Key,
-  Check,
-  Timer,
-  Mail,
-  ShieldEllipsis
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { PRODUCT } from "@/lib/product";
-import { cn } from "@/lib/utils";
-
-// Funções de máscara
+// Funções de máscara para campos de formulário
 const maskCPF = (value: string) => {
   return value
     .replace(/\D/g, "")
@@ -339,7 +154,7 @@ const ORDER_BUMPS = [
   },
 ];
 
-export default function CheckoutPage() {
+function CheckoutContent() {
   const [paymentMethod, setPaymentMethod] = useState<"pix" | "card">("pix");
   const [selectedBumps, setSelectedBumps] = useState<string[]>([]);
   const [timeLeft, setTimeLeft] = useState(899); // 14:59
@@ -419,7 +234,7 @@ export default function CheckoutPage() {
 
   return (
     <div className="min-h-screen bg-[#04070d] text-foreground pb-20">
-      {/* Barra de Urgência Superior */}
+      {/* Barra de Urgência */}
       <div className="sticky top-0 z-50 flex items-center justify-center gap-3 bg-gradient-to-r from-gold-deep via-gold to-gold-deep py-2 text-navy-deep shadow-lg">
         <Timer size={14} className="animate-pulse" />
         <p className="text-[10px] font-bold uppercase tracking-[0.2em]">
@@ -441,7 +256,7 @@ export default function CheckoutPage() {
       <main className="mx-auto mt-8 max-w-7xl px-5 lg:mt-12">
         <div className="grid gap-8 lg:grid-cols-[1fr_400px]">
           <div className="space-y-8">
-            {/* Banner de Aquisição */}
+            {/* Adquirendo Informação */}
             <div className="glass-dark flex items-center justify-between rounded-2xl px-6 py-4">
               <div className="flex items-center gap-3">
                 <Truck className="text-gold" size={20} />
@@ -463,23 +278,15 @@ export default function CheckoutPage() {
 
             <section className="glass-dark rounded-[2rem] p-6 md:p-8">
               <SectionHeader number={2} title="Pagamento" />
-              <div className="mb-8 grid grid-cols-2 gap-3 md:grid-cols-4">
-                <button onClick={() => setPaymentMethod("card")} className={cn("flex flex-col items-center gap-2 rounded-xl border py-3 transition-all", paymentMethod === "card" ? "border-gold bg-gold/5 ring-1 ring-gold" : "border-white/5 bg-white/[0.02] hover:border-white/10")}>
-                  <CreditCard size={18} className={paymentMethod === "card" ? "text-gold" : "text-muted-foreground/60"} />
-                  <span className="text-[9px] font-bold uppercase tracking-widest">Cartão</span>
+              <div className="mb-8 grid grid-cols-2 gap-3 md:grid-cols-2">
+                <button onClick={() => setPaymentMethod("card")} className={cn("flex flex-col items-center gap-2 rounded-xl border py-4 transition-all", paymentMethod === "card" ? "border-gold bg-gold/5 ring-1 ring-gold" : "border-white/5 bg-white/[0.02] hover:border-white/10")}>
+                  <CreditCard size={20} className={paymentMethod === "card" ? "text-gold" : "text-muted-foreground/60"} />
+                  <span className="text-[10px] font-bold uppercase tracking-widest">Cartão de Crédito</span>
                 </button>
-                <button onClick={() => setPaymentMethod("pix")} className={cn("flex flex-col items-center gap-2 rounded-xl border py-3 transition-all", paymentMethod === "pix" ? "border-gold bg-gold/5 ring-1 ring-gold" : "border-white/5 bg-white/[0.02] hover:border-white/10")}>
-                  <QrCode size={18} className={paymentMethod === "pix" ? "text-gold" : "text-muted-foreground/60"} />
-                  <span className="text-[9px] font-bold uppercase tracking-widest">PIX</span>
+                <button onClick={() => setPaymentMethod("pix")} className={cn("flex flex-col items-center gap-2 rounded-xl border py-4 transition-all", paymentMethod === "pix" ? "border-gold bg-gold/5 ring-1 ring-gold" : "border-white/5 bg-white/[0.02] hover:border-white/10")}>
+                  <QrCode size={20} className={paymentMethod === "pix" ? "text-gold" : "text-muted-foreground/60"} />
+                  <span className="text-[10px] font-bold uppercase tracking-widest">PIX (Instantâneo)</span>
                 </button>
-                <div className="flex cursor-not-allowed flex-col items-center gap-2 rounded-xl border border-white/5 bg-white/[0.01] py-3 opacity-40">
-                  <ShieldCheck size={18} className="text-muted-foreground/60" />
-                  <span className="text-[9px] font-bold uppercase tracking-widest">Boleto</span>
-                </div>
-                <div className="flex cursor-not-allowed flex-col items-center gap-2 rounded-xl border border-white/5 bg-white/[0.01] py-3 opacity-40">
-                  <Users size={18} className="text-muted-foreground/60" />
-                  <span className="text-[9px] font-bold uppercase tracking-widest">PicPay</span>
-                </div>
               </div>
 
               {paymentMethod === "pix" ? (
@@ -488,16 +295,9 @@ export default function CheckoutPage() {
                     <QrCode size={20} />
                     <p className="text-sm font-bold uppercase tracking-widest">Instruções do Pix</p>
                   </div>
-                  {[
-                    { step: "01.", text: "Pagamento em segundos, sem complicações." },
-                    { step: "02.", text: "Basta escanear o QR Code que iremos gerar sua compra." },
-                    { step: "03.", text: "O PIX é 100% seguro e processado instantaneamente." }
-                  ].map((inst) => (
-                    <div key={inst.step} className="flex gap-4">
-                      <span className="font-display font-bold text-gold">{inst.step}</span>
-                      <p className="text-sm text-muted-foreground leading-relaxed">{inst.text}</p>
-                    </div>
-                  ))}
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    Pagamento em segundos, sem complicações. O PIX é 100% seguro e processado instantaneamente para garantir o envio imediato da sua peça.
+                  </p>
                 </div>
               ) : (
                 <div className="grid gap-4">
@@ -513,12 +313,12 @@ export default function CheckoutPage() {
 
             <section className="glass-dark overflow-hidden rounded-[2rem] p-0">
               <div className="bg-green-600/10 px-6 py-2 border-b border-green-500/20">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-green-400">🔥 APROVEITE!</span>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-green-400">🔥 OPORTUNIDADE ÚNICA</span>
               </div>
               <div className="p-6 md:p-8">
-                <SectionHeader number={3} title="Compre Junto" />
+                <SectionHeader number={3} title="Adicione ao seu Pedido" />
                 <p className="mb-6 text-[11px] font-medium text-muted-foreground">
-                  <span className="text-green-400 font-bold">59% das pessoas</span> que compraram também se interessaram por:
+                  <span className="text-green-400 font-bold">Mais vendidos:</span> Clientes Alpha Brasil costumam adicionar esses itens:
                 </p>
                 <div className="grid gap-3">
                   {ORDER_BUMPS.map((bump) => {
@@ -627,12 +427,17 @@ export default function CheckoutPage() {
             <ShieldEllipsis size={14} className="text-green-400" />
             <span className="text-[10px] font-bold uppercase tracking-widest text-green-400">Compra 100% Segura</span>
           </div>
-          <div className="mt-4 flex flex-col items-center gap-2 opacity-50 grayscale hover:opacity-100 hover:grayscale-0 transition-all">
-             <div className="h-10 w-24 bg-white/10 rounded flex items-center justify-center text-[8px] font-bold">RA 1000</div>
-             <p className="text-[8px] uppercase tracking-widest">Verificado pelo ReclameAqui</p>
-          </div>
+          <p className="text-[10px] text-muted-foreground/60">Alpha Brasil © {new Date().getFullYear()} — Todos os direitos reservados</p>
         </div>
       </footer>
     </div>
+  );
+}
+
+export default function CheckoutPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#04070d] flex items-center justify-center"><p className="text-gold font-display animate-pulse">CARREGANDO CHECKOUT...</p></div>}>
+      <CheckoutContent />
+    </Suspense>
   );
 }
