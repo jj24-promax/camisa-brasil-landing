@@ -14,6 +14,7 @@ const reviews = [
     text: "Acabamento impecável. Parece peça de coleção — uso e recebo elogio toda vez.",
     rating: 5,
     imageSrc: "/images/testimonials/1.png",
+    profileImageSrc: "/images/testimonials/profiles/1.jpg",
   },
   {
     name: "Juliana C.",
@@ -21,6 +22,7 @@ const reviews = [
     text: "O caimento valoriza demais. Cor vibrante sem parecer carnival kitsch.",
     rating: 5,
     imageSrc: "/images/testimonials/2.png",
+    profileImageSrc: "/images/testimonials/profiles/2.jpg",
   },
   {
     name: "Diego A.",
@@ -28,6 +30,7 @@ const reviews = [
     text: "Leve, confortável e com presença forte. Virou minha camisa favorita.",
     rating: 5,
     imageSrc: "/images/testimonials/3.png",
+    profileImageSrc: "/images/testimonials/profiles/3.jpg",
   },
 ];
 
@@ -97,11 +100,22 @@ export function SocialProof() {
               <blockquote className="relative z-10 mt-4 text-[15px] leading-relaxed text-foreground/95">
                 {r.text}
               </blockquote>
-              <figcaption className="mt-auto border-t border-white/[0.05] pt-5">
-                <p className="font-display text-sm font-semibold tracking-tight">{r.name}</p>
-                <p className="mt-1 text-xs uppercase tracking-[0.2em] text-muted-foreground">
-                  {r.city}
-                </p>
+              <figcaption className="mt-auto flex items-center gap-4 border-t border-white/[0.05] pt-5">
+                <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full">
+                  <Image
+                    src={r.profileImageSrc}
+                    alt={`Foto de perfil de ${r.name}`}
+                    fill
+                    className="object-cover"
+                    sizes="40px"
+                  />
+                </div>
+                <div>
+                  <p className="font-display text-sm font-semibold tracking-tight">{r.name}</p>
+                  <p className="mt-1 text-xs uppercase tracking-[0.2em] text-muted-foreground">
+                    {r.city}
+                  </p>
+                </div>
               </figcaption>
             </div>
           </motion.figure>
