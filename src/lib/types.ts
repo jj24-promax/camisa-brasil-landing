@@ -1,9 +1,12 @@
-import type { PRODUCT, SIZES } from "@/lib/product";
+import type { PRODUCTS, SIZES } from "@/lib/products";
 
 export type Size = (typeof SIZES)[number];
 
+export type Product = (typeof PRODUCTS)[number];
+
 export type CartItem = {
-  id: string;
+  id: string; // Combination of product ID and size
+  productId: string;
   name: string;
   imageSrc: string;
   priceCents: number;
@@ -11,5 +14,3 @@ export type CartItem = {
   size: Size;
   quantity: number;
 };
-
-export type Product = typeof PRODUCT;
