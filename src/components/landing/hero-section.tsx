@@ -48,14 +48,14 @@ export function HeroSection({
     >
       <div className="relative z-10 mx-auto flex max-w-[1600px] flex-col items-center px-5 pb-20 pt-[6rem] md:px-10 md:pb-24 md:pt-28 xl:px-14">
         
-        {/* Logo Centralizado e MASSIVO */}
+        {/* Logo Centralizado e MASSIVO (+80%) */}
         <motion.div
           initial={{ opacity: 0, y: -20, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
           className="relative mb-6 flex w-full justify-center md:mb-8"
         >
-          <div className="relative h-28 w-full max-w-[320px] md:h-52 md:max-w-[800px] lg:h-64 lg:max-w-[1000px]">
+          <div className="relative h-48 w-full max-w-[580px] md:h-[380px] md:max-w-[1400px] lg:h-[480px] lg:max-w-[1600px]">
             <Image
               src="/images/logo-alpha-brasil.png"
               alt="Alpha Brasil"
