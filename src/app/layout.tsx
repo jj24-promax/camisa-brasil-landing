@@ -19,7 +19,7 @@ const display = Syne({
 });
 
 export const metadata: Metadata = {
-  title: "Alpha Brasil | Camisa do Brasil Estilizada — R$ 69",
+  title: "Alpha Brasil | Camisa do Brasil Estilizada — R$ 67,90",
   description:
     "Alpha Brasil - Camisa premium com identidade brasileira, acabamento refinado e presença marcante. Edição limitada.",
   keywords: [

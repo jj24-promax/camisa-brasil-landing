@@ -2,8 +2,8 @@ export const PRODUCT = {
   id: "camisa-brasil-estilizada",
   name: "Camisa do Brasil Estilizada",
   shortName: "Brasil Estilizada",
-  priceFormatted: "R$ 69,00",
-  priceCents: 6900,
+  priceFormatted: "R$ 67,90",
+  priceCents: 6790,
   currency: "BRL",
 } as const;
 
