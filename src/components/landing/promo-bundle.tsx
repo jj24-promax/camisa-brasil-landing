@@ -12,20 +12,8 @@ type PromoBundleProps = {
 export function PromoBundle({ onAddToCart }: PromoBundleProps) {
   return (
     <SectionShell variant="highlight" grain="low" className="py-12 md:py-20">
-      <div className="mx-auto max-w-6xl">
-        <SectionReveal className="grid items-center gap-12 lg:grid-cols-2">
-          {/* Imagem ampliada e sem bordas de card */}
-          <div className="relative order-1 mx-auto aspect-square w-full max-w-[600px] overflow-hidden md:order-2 lg:max-w-none">
-            <Image
-              src="/images/promo-bundle.png"
-              alt="Promoção Leve 3 Pague 2"
-              fill
-              className="object-contain"
-              sizes="(max-width: 768px) 100vw, 600px"
-              priority
-            />
-          </div>
-
+      <div className="mx-auto max-w-7xl">
+        <SectionReveal className="grid items-center gap-12 lg:grid-cols-[1fr_1.3fr]">
           <div className="order-2 text-center md:order-1 lg:text-left">
             <div className="inline-flex items-center gap-2 rounded-full border border-gold/30 bg-gold/5 px-4 py-1.5 text-gold mb-6">
               <TicketPercent size={16} />
@@ -44,6 +32,17 @@ export function PromoBundle({ onAddToCart }: PromoBundleProps) {
                 Aproveitar Oferta
               </Button>
             </div>
+          </div>
+
+          <div className="relative order-1 mx-auto aspect-square w-full max-w-[780px] overflow-hidden rounded-[2.5rem] md:order-2 lg:max-w-none shadow-luxe">
+            <Image
+              src="/images/promo-bundle.png"
+              alt="Promoção Leve 3 Pague 2"
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 800px"
+              priority
+            />
           </div>
         </SectionReveal>
       </div>
