@@ -166,7 +166,7 @@ export function HeroSection({
               transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
               className="relative w-full"
             >
-              <div className="relative z-10 hero-product-frame flex flex-col overflow-hidden rounded-[1.75rem] bg-black/20 md:rounded-[2rem]">
+              <div className="relative z-10 hero-product-frame flex flex-col overflow-hidden rounded-[1.75rem] bg-navy-deep md:rounded-[2rem]">
                 <div className="relative flex w-full items-center justify-center">
                   <div className="relative w-full max-w-[min(100%,520px)] lg:max-w-[min(100%,600px)]">
                     <LuxuryProductSlider
