@@ -327,7 +327,17 @@ export default function CheckoutPage() {
           </div>
 
           <aside className="lg:sticky lg:top-24 h-fit">
-            <div className="glass-dark rounded-[2rem] p-6 md:p-8">
+            <div className="glass-dark overflow-hidden rounded-[2rem] p-6 md:p-8">
+              <div className="relative mb-6 aspect-square w-full overflow-hidden rounded-2xl border border-white/10 shadow-lg">
+                <Image
+                  src="/images/camisa-checkout-display.png"
+                  alt="Sua Edição Sagrada"
+                  fill
+                  className="object-cover"
+                  priority
+                />
+              </div>
+
               <h3 className="font-display text-lg font-bold uppercase tracking-tight text-white mb-6">Resumo da Compra</h3>
               <div className="space-y-4 mb-8">
                 <div className="flex justify-between text-sm"><span className="text-muted-foreground">Subtotal ({pricing.quantity} un)</span><span className="text-white">{new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(pricing.subtotal / 100)}</span></div>
