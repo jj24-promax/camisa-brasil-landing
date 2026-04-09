@@ -7,6 +7,7 @@ import { ProductDetails } from "@/components/landing/product-details";
 import { PromoBundle } from "@/components/landing/promo-bundle";
 import { PremiumGallery } from "@/components/landing/premium-gallery";
 import { SocialProof } from "@/components/landing/social-proof";
+import { GuaranteeSection } from "@/components/landing/guarantee-section";
 import { SizeChart } from "@/components/landing/size-chart";
 import { FaqSection } from "@/components/landing/faq-section";
 import { FinalCta } from "@/components/landing/final-cta";
@@ -107,6 +108,7 @@ export default function HomePage() {
         <PromoBundle onAddToCart={handleAddToCart} />
         <PremiumGallery />
         <SocialProof />
+        <GuaranteeSection />
         <SizeChart />
         <FaqSection />
         <FinalCta onAddToCart={handleAddToCart} />
