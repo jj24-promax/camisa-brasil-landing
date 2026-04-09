@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useMemo } from "react";
+import { useRouter } from "next/navigation";
 import {
   Dialog,
   DialogContent,
@@ -11,7 +12,6 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import type { CartItem } from "@/lib/types";
-import { handleBuyNow } from "@/lib/purchase-handlers";
 import { Minus, Plus, ShoppingCart, Trash2 } from "lucide-react";
 
 type CartDialogProps = {
@@ -29,6 +29,8 @@ export function CartDialog({
   updateQuantity,
   removeItem,
 }: CartDialogProps) {
+  const router = useRouter();
+  
   const totalCents = useMemo(
     () => items.reduce((sum, item) => sum + item.priceCents * item.quantity, 0),
     [items]
@@ -42,9 +44,8 @@ export function CartDialog({
   }, [totalCents]);
 
   const onCheckout = () => {
-    // Placeholder for checkout logic
-    console.info("Proceeding to checkout with items:", items);
     onOpenChange(false);
+    router.push("/checkout");
   };
 
   return (
