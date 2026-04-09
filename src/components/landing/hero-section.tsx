@@ -46,16 +46,16 @@ export function HeroSection({
       className="relative min-h-[100dvh] overflow-hidden bg-[#04070d]"
       aria-labelledby="hero-heading"
     >
-      <div className="relative z-10 mx-auto flex max-w-[1600px] flex-col items-center px-5 pb-24 pt-[6.5rem] md:px-10 md:pb-28 md:pt-32 xl:px-14">
+      <div className="relative z-10 mx-auto flex max-w-[1600px] flex-col items-center px-5 pb-20 pt-[6rem] md:px-10 md:pb-24 md:pt-28 xl:px-14">
         
-        {/* Logo Centralizado e Maior */}
+        {/* Logo Centralizado e MASSIVO */}
         <motion.div
           initial={{ opacity: 0, y: -20, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-          className="relative mb-12 flex w-full justify-center md:mb-16"
+          className="relative mb-6 flex w-full justify-center md:mb-8"
         >
-          <div className="relative h-24 w-72 md:h-36 md:w-[520px] lg:h-44 lg:w-[640px]">
+          <div className="relative h-28 w-full max-w-[320px] md:h-52 md:max-w-[800px] lg:h-64 lg:max-w-[1000px]">
             <Image
               src="/images/logo-alpha-brasil.png"
               alt="Alpha Brasil"
@@ -66,13 +66,13 @@ export function HeroSection({
           </div>
         </motion.div>
 
-        <div className="grid grid-cols-1 items-center gap-14 md:gap-20 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16 w-full">
+        <div className="grid grid-cols-1 items-center gap-10 md:gap-16 lg:grid-cols-[1.1fr_0.9fr] lg:gap-14 w-full">
           <div className="order-2 flex flex-col justify-center text-center lg:order-1 lg:text-left">
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="mb-6 flex items-center justify-center gap-2 lg:justify-start"
+              className="mb-5 flex items-center justify-center gap-2 lg:justify-start"
             >
               <div className="flex gap-0.5">
                 {[...Array(5)].map((_, i) => (
@@ -103,7 +103,7 @@ export function HeroSection({
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.4 }}
-              className="mx-auto mt-8 max-w-xl text-lg font-medium leading-relaxed text-muted-foreground/90 lg:mx-0 md:text-xl"
+              className="mx-auto mt-6 max-w-xl text-lg font-medium leading-relaxed text-muted-foreground/90 lg:mx-0 md:text-xl"
             >
               Design purificado com a presença do <span className="text-white font-bold">Cristo Redentor</span> em jacquard. Uma peça que resgata a verdadeira essência do Brasil com elegância e respeito.
             </motion.p>
@@ -112,7 +112,7 @@ export function HeroSection({
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.5 }}
-              className="mt-12 flex flex-col gap-6"
+              className="mt-10 flex flex-col gap-6"
             >
               <div className="relative overflow-hidden rounded-[2rem] border border-white/[0.08] bg-white/[0.02] p-6 shadow-luxe backdrop-blur-xl md:p-10">
                 <div className="flex flex-col gap-8">
