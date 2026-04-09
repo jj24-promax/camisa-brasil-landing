@@ -73,6 +73,63 @@ function Stars({ n }: { n: number }) {
   );
 }
 
+const firstRow = reviews.slice(0, reviews.length / 2);
+const secondRow = reviews.slice(reviews.length / 2);
+
+function ReviewMarquee({
+  reviews,
+  reverse = false,
+}: {
+  reviews: (typeof reviews)[number][];
+  reverse?: boolean;
+}) {
+  return (
+    <div
+      className="group relative w-full overflow-hidden"
+      style={{
+        maskImage: "linear-gradient(to right, transparent, black 10%, black 90%, transparent)",
+        WebkitMaskImage:
+          "linear-gradient(to right, transparent, black 10%, black 90%, transparent)",
+      }}
+    >
+      <div
+        className={cn(
+          "flex min-w-max gap-6 group-hover:[animation-play-state:paused] md:gap-8",
+          reverse ? "animate-scroll-x-reverse" : "animate-scroll-x"
+        )}
+      >
+        {[...reviews, ...reviews].map((r, i) => (
+          <figure
+            key={`${r.name}-${i}`}
+            className="glass-dark w-[300px] shrink-0 rounded-2xl p-6 transition-all duration-300 hover:!border-white/[0.12] hover:!shadow-luxe-hover md:w-[340px]"
+          >
+            <div className="flex items-center gap-4">
+              <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full">
+                <Image
+                  src={r.profileImageSrc}
+                  alt={`Foto de perfil de ${r.name}`}
+                  fill
+                  className="object-cover"
+                  sizes="48px"
+                />
+              </div>
+              <div>
+                <p className="font-display text-sm font-semibold tracking-tight">{r.name}</p>
+                <div className="mt-1">
+                  <Stars n={r.rating} />
+                </div>
+              </div>
+            </div>
+            <blockquote className="relative z-10 mt-4 text-[15px] leading-relaxed text-foreground/95">
+              {r.text}
+            </blockquote>
+          </figure>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export function SocialProof() {
   return (
     <SectionShell aria-labelledby="reviews-heading" variant="default" grain="low">
@@ -94,43 +151,9 @@ export function SocialProof() {
         </p>
       </SectionReveal>
 
-      <div
-        className="group relative mt-16 w-full overflow-hidden"
-        style={{
-          maskImage: "linear-gradient(to right, transparent, black 10%, black 90%, transparent)",
-          WebkitMaskImage:
-            "linear-gradient(to right, transparent, black 10%, black 90%, transparent)",
-        }}
-      >
-        <div className="flex min-w-max animate-scroll-x gap-6 group-hover:[animation-play-state:paused] md:gap-8">
-          {[...reviews, ...reviews].map((r, i) => (
-            <figure
-              key={`${r.name}-${i}`}
-              className="glass-dark w-[300px] shrink-0 rounded-2xl p-6 transition-all duration-300 hover:!border-white/[0.12] hover:!shadow-luxe-hover md:w-[340px]"
-            >
-              <div className="flex items-center gap-4">
-                <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full">
-                  <Image
-                    src={r.profileImageSrc}
-                    alt={`Foto de perfil de ${r.name}`}
-                    fill
-                    className="object-cover"
-                    sizes="48px"
-                  />
-                </div>
-                <div>
-                  <p className="font-display text-sm font-semibold tracking-tight">{r.name}</p>
-                  <div className="mt-1">
-                    <Stars n={r.rating} />
-                  </div>
-                </div>
-              </div>
-              <blockquote className="relative z-10 mt-4 text-[15px] leading-relaxed text-foreground/95">
-                {r.text}
-              </blockquote>
-            </figure>
-          ))}
-        </div>
+      <div className="mt-16 flex flex-col gap-6 md:gap-8">
+        <ReviewMarquee reviews={firstRow} />
+        <ReviewMarquee reviews={secondRow} reverse />
       </div>
     </SectionShell>
   );
