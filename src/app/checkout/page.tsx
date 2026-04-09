@@ -72,7 +72,7 @@ const maskExpiry = (value: string) => {
 
 const SectionHeader = ({ number, title }: { number: number; title: string }) => (
   <div className="flex items-center gap-3 mb-6">
-    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gold text-navy-deep font-bold text-sm">
+    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gold text-navy<dyad-write path="src/app/checkout/page.tsx" description="Fixing syntax error and completing the checkout page implementation.">-deep font-bold text-sm">
       {number}
     </div>
     <h2 className="font-display text-lg font-bold uppercase tracking-tight text-white">{title}</h2>
@@ -174,215 +174,7 @@ export default function CheckoutPage() {
     phone: "",
     cpf: "",
     cep: "",
-    city: "",
-    address: "",
-    number: "",
-    neighborhood: "",
-    complement: "",
-    cardNumber: "",
-    cardExpiry: "",
-    cardCVV: "",
-    cardName: ""
-  });
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeLeft((prev) => (prev > 0 ? prev - 1 : 0));
-    }, 1000);
-    return () => clearInterval(timer);
-  }, []);
-
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  };
-
-  const searchParams = useSearchParams();
-  const quantity = parseInt(searchParams.get("q") || "1", 10);
-  
-  const toggleBump = (id: string) => {
-    setSelectedBumps(prev => prev.includes(id) ? prev.filter(b => b !== id) : [...prev, id]);
-  };
-
-  const pricing = useMemo(() => {
-    const unitPrice = PRODUCT.priceCents;
-    const subtotal = unitPrice * quantity;
-    const freeItems = Math.floor(quantity / 3);
-    const itemDiscount = freeItems * unitPrice;
-    const bumpsTotal = ORDER_BUMPS.filter(b => selectedBumps.includes(b.id)).reduce((sum, b) => sum + b.priceCents, 0);
-    const total = subtotal - itemDiscount + bumpsTotal;
-    const format = (cents: number) => new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(cents / 100);
-
-    return { subtotal, discount: format(itemDiscount), discountValue: itemDiscount, bumpsTotal, total: format(total), quantity };
-  }, [quantity, selectedBumps]);
-
-  const handleInputChange = (field: keyof typeof formData, value: string, maskFn?: (v: string) => string) => {
-    setFormData(prev => ({ ...prev, [field]: maskFn ? maskFn(value) : value }));
-  };
-
-  const handleFinalize = () => {
-    if (paymentMethod === "card") {
-      toast.error("Sistema de Cartão indisponível, refaça a compra via Pix por gentileza!", {
-        duration: 5000,
-        icon: '⚠️',
-        style: {
-          borderRadius: '12px',
-          background: '#060a12',
-          color: '#fff',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
-          fontSize: '14px',
-          fontWeight: '600'
-        }
-      });
-      return;
-    }
-    toast.success("Gerando seu código Pix de pagamento...");
-  };
-
-  return (
-    <div className="min-h-screen bg-[#04070d] text-foreground pb-20">
-      {/* Barra de Urgência Superior */}
-      <div className="sticky top-0 z-50 flex items-center justify-center gap-3 bg-gradient-to-r from-gold-deep via-gold to-gold-deep py-2 text-navy-deep shadow-lg">
-        <Timer size={14} className="animate-pulse" />
-        <p className="text-[10px] font-bold uppercase tracking-[0.2em]">
-          Garanta o desconto especial agora! <span className="ml-2 font-mono tabular-nums">{formatTime(timeLeft)}</span>
-        </p>
-      </div>
-
-      <header className="border-b border-white/5 bg-navy-deep/50 backdrop-blur-xl">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5">
-          <Link href="/" className="flex items-center gap-2 text-muted-foreground hover:text-gold transition-colors">
-            <ChevronLeft size={18} />
-            <span className="text-[10px] font-bold uppercase tracking-widest">Voltar</span>
-          </Link>
-          <p className="font-display text-xs font-bold tracking-[0.3em] text-gold-bright">ALPHA BRASIL</p>
-          <Lock size={16} className="text-muted-foreground/40" />
-        </div>
-      </header>
-
-      <main className="mx-auto mt-8 max-w-7xl px-5 lg:mt-12">
-        <div className="grid gap-8 lg:grid-cols-[1fr_400px]">
-          <div className="space-y-8">
-            {/* Banner de Aquisição */}
-            <div className="glass-dark flex items-center justify-between rounded-2xl px-6 py-4">
-              <div className="flex items-center gap-3">
-                <Truck className="text-gold" size={20} />
-                <p className="text-xs font-bold uppercase tracking-widest text-white/90">Você está adquirindo:</p>
-              </div>
-              <p className="text-xs font-bold text-gold-bright">{PRODUCT.name} ({quantity} un)</p>
-            </div>
-
-            <section className="glass-dark rounded-[2rem] p-6 md:p-8">
-              <SectionHeader number={1} title="Dados Pessoais" />
-              <div className="grid gap-4 md:grid-cols-2">
-                <InputGroup label="Nome Completo" placeholder="Digite seu nome completo" className="md:col-span-2" value={formData.name} onChange={(e) => handleInputChange("name", e.target.value)} />
-                <InputGroup label="E-mail" placeholder="seu@email.com" type="email" icon={Mail} value={formData.email} onChange={(e) => handleInputChange("email", e.target.value)} />
-                <InputGroup label="Confirmar E-mail" placeholder="Repita seu e-mail" type="email" icon={Mail} value={formData.confirmEmail} onChange={(e) => handleInputChange("confirmEmail", e.target.value)} />
-                <InputGroup label="WhatsApp" placeholder="(00) 00000-0000" value={formData.phone} onChange={(e) => handleInputChange("phone", e.target.value, maskPhone)} maxLength={15} />
-                <InputGroup label="CPF ou CNPJ" placeholder="000.000.000-00" value={formData.cpf} onChange={(e) => handleInputChange("cpf", e.target.value, maskCPF)} maxLength={14} />
-              </div>
-            </section>
-
-            <section className="glass-dark rounded-[2rem] p-6 md:p-8">
-              <SectionHeader number={2} title="Pagamento" />
-              <div className="mb-8 grid grid-cols-2 gap-3 md:grid-cols-4">
-                <button onClick={() => setPaymentMethod("card")} className={cn("flex flex-col items-center gap-2 rounded-xl border py-3 transition-all", paymentMethod === "card" ? "border-gold bg-gold/5 ring-1 ring-gold" : "border-white/5 bg-white/[0.02] hover:border-white/10")}>
-                  <CreditCard size={18} className={paymentMethod === "card" ? "text-gold" : "text-muted-foreground/60"} />
-                  <span className="text-[9px] font-bold uppercase tracking-widest">Cartão</span>
-                </button>
-                <button onClick={() => setPaymentMethod("pix")} className={cn("flex flex-col items-center gap-2 rounded-xl border py-3 transition-all", paymentMethod === "pix" ? "border-gold bg-gold/5 ring-1 ring-gold" : "border-white/5 bg-white/[0.02] hover:border-white/10")}>
-                  <QrCode size={18} className={paymentMethod === "pix" ? "text-gold" : "text-muted-foreground/60"} />
-                  <span className="text-[9px] font-bold uppercase tracking-widest">PIX</span>
-                </button>
-                <div className="flex cursor-not-allowed flex-col items-center gap-2 rounded-xl border border-white/5 bg-white/[0.01] py-3 opacity-40">
-                  <ShieldCheck size={18} className="text-muted-foreground/60" />
-                  <span className="text-[9px] font-bold uppercase tracking-widest">Boleto</span>
-                </div>
-                <div className="flex cursor-not-allowed flex-col items-center gap-2 rounded-xl border border-white/5 bg-white/[0.01] py-3 opacity-40">
-                  <Users size={18} className="text-muted-foreground/60" />
-                  <span className="text-[9px] font-bold uppercase tracking-widest">PicPay</span>
-                </div>
-              </div>
-
-              {paymentMethod === "pix" ? (
-                <div className="space-y-4 rounded-2xl bg-white/[0.02] p-6 border border-white/5">
-                  <div className="flex items-center gap-2 text-gold-bright mb-4">
-                    <QrCode size={20} />
-                    <p className="text-sm font-bold uppercase tracking-widest">Instruções do Pix</p>
-                  </div>
-                  {[
-                    { step: "01.", text: "Pagamento em segundos, sem complicações." },
-                    { step: "02.", text: "Basta escanear o QR Code que iremos gerar sua compra." },
-                    { step: "03.", text: "O PIX é 100% seguro e processado instantaneamente." }
-                  ].map((inst) => (
-                    <div key={inst.step} className="flex gap-4">
-                      <span className="font-display font-bold text-gold">{inst.step}</span>
-                      <p className="text-sm text-muted-foreground leading-relaxed">{inst.text}</p>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="grid gap-4">
-                  <InputGroup label="Número do Cartão" placeholder="0000 0000 0000 0000" value={formData.cardNumber} onChange={(e) => handleInputChange("cardNumber", e.target.value, maskCardNumber)} maxLength={19} />
-                  <div className="grid grid-cols-2 gap-4">
-                    <InputGroup label="Validade" placeholder="MM/AA" value={formData.cardExpiry} onChange={(e) => handleInputChange("cardExpiry", e.target.value, maskExpiry)} maxLength={5} />
-                    <InputGroup label="CVV" placeholder="123" value={formData.cardCVV} onChange={(e) => handleInputChange("cardCVV", e.target.value.replace(/\D/g, ""))} maxLength={4} />
-                  </div>
-                  <InputGroup label="Nome no Cartão" placeholder="Como no cartão" value={formData.cardName} onChange={(e) => handleInputChange("cardName", e.target.value)} />
-                </div>
-              )}
-            </section>
-
-            <section className="glass-dark overflow-hidden rounded-[2rem] p-0">
-              <div className="bg-green-600/10 px-6 py-2 border-b border-green-500/20">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-green-400">🔥 APROVEITE!</span>
-              </div>
-              <div className="p-6 md:p-8">
-                <SectionHeader number={3} title="Compre Junto" />
-                <p className="mb-6 text-[11px] font-medium text-muted-foreground">
-                  <span className="think
-The previous response was cut off within the `src/app/checkout/page.tsx` file, specifically inside the `SectionHeader` for "Compre Junto" (step 3). I need to resume the `dyad-write` block for that file, completing the JSX for the order bumps and the rest of the component.
-
-The previous snippet ended at:
-`<span className="text-green-400 font-bold">59% das pessoas</span> que compraram também se interessaram por:`
-
-I need to continue from there.
-
-1.  List the order bumps using the `ORDER_BUMPS` array.
-2.  Render each bump with its image, title, offer, and price.
-3.  Include the checkbox logic for selecting/deselecting.
-4.  Finish the main content and the aside (summary).
-5.  Close the `main`, `div`, `div` (layout structure), and `dyad-write`.
-
-I should also make sure all the necessary imports and logic are present since I'm continuing a file write.
-
-Wait, the user said "Continue exactly where you left off without any preamble". This means I should output just the remaining part of the code inside the `<dyad-write>` block if possible, but since the editor expects complete files in `<dyad-write>`, I should rewrite the whole file or at least the relevant part if I can't "append". However, the instructions say "Only use ONE <dyad-write> block per file". So I must provide the *entire* file again to ensure it's correct and complete.
-
-Actually, looking at the previous response, it ended abruptly. I will rewrite the `src/app/checkout/page.tsx` file in full to be safe and follow the rule of one write per file.
-
-Wait, the previous response actually ended in the middle of a string inside the JSX.
-`text-green-400">` ...
-
-I will provide the complete `src/app/checkout/page.tsx` file.
-
-Order bumps to include:
-1. Personalização Nome + Número
-2. Leve a 2ª para Presente
-3. Patch de Campeão Premium
-4. Embalagem Alpha Collector
-5. Chaveiro Réplica Escudo
-6. Entrega Blindada
-
-I'll use the images I copied in the previous step:
-- `/images/bumps/name.png`
-- `/images/bumps/shirt.png`
-- `/images/bumps/patch.png`
-- `/images/bumps/box.png`
-- `/images/bumps/keychain.png`
-- `/images/bumps/insurance.png`
-
-Let's write.<dyad-write path="src/app/checkout/page.tsx" description="Finalizando a implementação do checkout com os novos orderbumps visuais.">
+    city: "",<dyad-write path="src/app/checkout/page.tsx" description="Restaurando o arquivo de checkout completo e corrigido, com todos os elementos de conversão e orderbumps.">
 "use client";
 
 import React, { useState, useMemo, useEffect } from "react";
@@ -655,7 +447,7 @@ export default function CheckoutPage() {
                 <Truck className="text-gold" size={20} />
                 <p className="text-xs font-bold uppercase tracking-widest text-white/90">Você está adquirindo:</p>
               </div>
-              <p className="text-xs font-bold text-gold-bright">{PRODUCT.name} ({quantity} un)</p>
+              <p className="text-xs font-bold text-gold-bright">{PRODUCT.name} ({pricing.quantity} un)</p>
             </div>
 
             <section className="glass-dark rounded-[2rem] p-6 md:p-8">
