@@ -180,7 +180,7 @@ export function HeroSection({
                       <div className="absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-black/60 via-black/40 to-transparent p-5 text-center">
                         <div
                           role="status"
-                          className="inline-flex items-center justify-center rounded-full border border-gold/30 bg-black/40 px-4 py-1.5 backdrop-blur-sm"
+                          className="inline-flex items-center justify-center rounded-full border border-gold/30 bg-black/40 px-4 py-1.5"
                         >
                           <p className="font-display text-[9px] font-bold uppercase tracking-[0.3em] text-gold-bright">
                             Edição de Elite
