@@ -7,42 +7,47 @@ import { CheckCircle2 } from "lucide-react";
 const NAMES = ["João S.", "Maria V.", "Ricardo F.", "Fernanda M.", "Lucas A.", "Beatriz R.", "Rafael C.", "Juliana P.", "Gustavo T.", "Ana L."];
 const CITIES = ["São Paulo, SP", "Rio de Janeiro, RJ", "Belo Horizonte, MG", "Curitiba, PR", "Porto Alegre, RS", "Salvador, BA", "Fortaleza, CE", "Brasília, DF"];
 
-export function SalesNotifications() {
+type SalesNotificationsProps = {
+  isVisible: boolean;
+};
+
+export function SalesNotifications({ isVisible }: SalesNotificationsProps) {
   const [notification, setNotification] = useState<{ name: string; city: string } | null>(null);
 
   useEffect(() => {
+    // Se a barra não estiver visível, limpamos qualquer notificação ativa e não fazemos nada
+    if (!isVisible) {
+      setNotification(null);
+      return;
+    }
+
     const showNotification = () => {
       const name = NAMES[Math.floor(Math.random() * NAMES.length)];
-      const city = CITIES[CITIES.length - 1 - Math.floor(Math.random() * CITIES.length)];
-      setNotification({ 
-        name, 
-        city: city || CITIES[0] 
-      });
+      const city = CITIES[Math.floor(Math.random() * CITIES.length)];
+      setNotification({ name, city });
 
-      // Tempo que a notificação fica visível
       setTimeout(() => {
         setNotification(null);
       }, 4000);
     };
 
-    // Primeira notificação mais rápida (2 segundos)
-    const initialTimer = setTimeout(showNotification, 2000);
+    // Agenda a primeira notificação após 1.5s de a barra aparecer
+    const initialTimer = setTimeout(showNotification, 1500);
 
-    // Intervalo (entre 6 e 12 segundos)
     const interval = setInterval(() => {
       showNotification();
-    }, 6000 + Math.random() * 6000);
+    }, 8000 + Math.random() * 7000);
 
     return () => {
       clearTimeout(initialTimer);
       clearInterval(interval);
     };
-  }, []);
+  }, [isVisible]);
 
   return (
     <div className="fixed bottom-24 left-4 z-[60] md:bottom-6 md:left-6">
       <AnimatePresence>
-        {notification && (
+        {isVisible && notification && (
           <motion.div
             initial={{ opacity: 0, x: -20, scale: 0.95 }}
             animate={{ opacity: 1, x: 0, scale: 1 }}

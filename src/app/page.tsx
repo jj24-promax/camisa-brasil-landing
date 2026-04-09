@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import toast from "react-hot-toast";
 import { HeroSection } from "@/components/landing/hero-section";
 import { ProductDetails } from "@/components/landing/product-details";
@@ -22,6 +22,19 @@ export default function HomePage() {
   const [selectedSize, setSelectedSize] = useState<Size>("M");
   const [cart, setCart] = useState<CartItem[]>([]);
   const [cartOpen, setCartOpen] = useState(false);
+  const [isStickyVisible, setIsStickyVisible] = useState(false);
+
+  // Monitora o scroll para ativar a sticky bar e as notificações
+  useEffect(() => {
+    const handleScroll = () => {
+      const threshold = window.innerHeight * 0.5;
+      setIsStickyVisible(window.scrollY > threshold);
+    };
+    
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const handleAddToCart = () => {
     setCart((prevCart) => {
@@ -110,8 +123,8 @@ export default function HomePage() {
         </p>
       </footer>
 
-      <StickyBuyBar onAddToCart={handleAddToCart} />
-      <SalesNotifications />
+      <StickyBuyBar isVisible={isStickyVisible} onAddToCart={handleAddToCart} />
+      <SalesNotifications isVisible={isStickyVisible} />
       <CartDialog
         open={cartOpen}
         onOpenChange={setCartOpen}

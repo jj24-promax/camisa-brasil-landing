@@ -1,31 +1,19 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { PRODUCT } from "@/lib/product";
 import { ShoppingCart } from "lucide-react";
 
 type StickyBuyBarProps = {
+  isVisible: boolean;
   onAddToCart: () => void;
 };
 
-export function StickyBuyBar({ onAddToCart }: StickyBuyBarProps) {
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    const onScroll = () => {
-      const threshold = typeof window !== "undefined" ? window.innerHeight * 0.5 : 400;
-      setVisible(window.scrollY > threshold);
-    };
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
+export function StickyBuyBar({ isVisible, onAddToCart }: StickyBuyBarProps) {
   return (
     <AnimatePresence>
-      {visible && (
+      {isVisible && (
         <motion.div
           initial={{ y: 110, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
