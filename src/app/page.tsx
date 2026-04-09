@@ -2,7 +2,6 @@
 
 import { useState, useMemo } from "react";
 import toast from "react-hot-toast";
-import Image from "next/image";
 import { HeroSection } from "@/components/landing/hero-section";
 import { ProductDetails } from "@/components/landing/product-details";
 import { PromoBundle } from "@/components/landing/promo-bundle";
@@ -69,15 +68,9 @@ export default function HomePage() {
         <div className="mx-auto flex h-[3.75rem] max-w-[1600px] items-center gap-3 px-5 md:gap-6 md:px-10 xl:px-14">
           <a
             href="#inicio"
-            className="relative shrink-0 flex items-center h-8 w-28 transition-opacity hover:opacity-80"
+            className="shrink-0 font-display text-sm font-bold tracking-[0.3em] text-gold-bright transition-opacity hover:opacity-80"
           >
-            <Image
-              src="/images/logo-alpha-brasil.png"
-              alt="Alpha Brasil Logo"
-              fill
-              className="object-contain"
-              priority
-            />
+            ALPHA BRASIL
           </a>
           <div className="hidden min-w-0 flex-1 justify-center md:flex">
             <SiteNavDesktop />

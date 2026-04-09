@@ -2,6 +2,7 @@
 
 import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
 import { useRef } from "react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { TrustBadges } from "./trust-badges";
 import { PRODUCT, SIZES, HERO_PRODUCT_SLIDES } from "@/lib/product";
@@ -49,8 +50,26 @@ export function HeroSection({
         
         <div className="order-2 flex flex-col justify-center text-center lg:order-1 lg:text-left">
           <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            className="relative mb-8 flex justify-center lg:justify-start"
+          >
+            <div className="relative h-16 w-56 md:h-20 md:w-64 lg:h-24 lg:w-72">
+              <Image
+                src="/images/logo-alpha-brasil.png"
+                alt="Alpha Brasil"
+                fill
+                className="object-contain"
+                priority
+              />
+            </div>
+          </motion.div>
+
+          <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
             className="mb-6 flex items-center justify-center gap-2 lg:justify-start"
           >
             <div className="flex gap-0.5">
@@ -67,7 +86,7 @@ export function HeroSection({
             id="hero-heading"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
             className="font-display font-extrabold tracking-tight"
           >
             <span className="block text-[clamp(2.5rem,7vw,4.5rem)] leading-[0.9] text-white">
@@ -81,7 +100,7 @@ export function HeroSection({
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
             className="mx-auto mt-8 max-w-xl text-lg font-medium leading-relaxed text-muted-foreground/90 lg:mx-0 md:text-xl"
           >
             Design purificado com a presença do <span className="text-white font-bold">Cristo Redentor</span> em jacquard. Uma peça que resgata a verdadeira essência do Brasil com elegância e respeito.
@@ -90,7 +109,7 @@ export function HeroSection({
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
+            transition={{ duration: 0.6, delay: 0.5 }}
             className="mt-12 flex flex-col gap-6"
           >
             <div className="relative overflow-hidden rounded-[2rem] border border-white/[0.08] bg-white/[0.02] p-6 shadow-luxe backdrop-blur-xl md:p-10">
