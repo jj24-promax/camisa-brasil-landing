@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { DM_Sans, Syne } from "next/font/google";
 import { AmbientBackground } from "@/components/landing/ambient-background";
 import { Toaster } from "@/components/ui/toaster";
+import { Providers } from "./providers";
 import "./globals.css";
 
 const sans = DM_Sans({
@@ -55,9 +56,11 @@ export default function RootLayout({
       <body
         className={`${sans.variable} ${display.variable} font-sans min-h-[100dvh] bg-transparent text-foreground antialiased`}
       >
-        <AmbientBackground />
-        <div className="relative z-10 flex min-h-[100dvh] flex-col">{children}</div>
-        <Toaster />
+        <Providers>
+          <AmbientBackground />
+          <div className="relative z-10 flex min-h-[100dvh] flex-col">{children}</div>
+          <Toaster />
+        </Providers>
       </body>
     </html>
   );

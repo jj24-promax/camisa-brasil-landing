@@ -9,18 +9,18 @@ import { PRODUCT, SIZES, HERO_PRODUCT_SLIDES } from "@/lib/product";
 import type { Size } from "@/lib/types";
 import { useMobileParallaxOff } from "@/hooks/use-is-mobile-parallax";
 import { cn } from "@/lib/utils";
-import { ShoppingCart, Star } from "lucide-react";
+import { ArrowRight, Star } from "lucide-react";
 
 type HeroSectionProps = {
   selectedSize: Size;
   onSizeChange: (s: Size) => void;
-  onAddToCart: () => void;
+  onBuyNow: () => void;
 };
 
 export function HeroSection({
   selectedSize,
   onSizeChange,
-  onAddToCart,
+  onBuyNow,
 }: HeroSectionProps) {
   const sectionRef = useRef<HTMLElement>(null);
   const mobileOff = useMobileParallaxOff();
@@ -53,9 +53,11 @@ export function HeroSection({
           initial={{ opacity: 0, y: -20, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-          className="relative mb-6 flex w-full justify-center md:mb-12"
+          className="relative mb-6 flex w-full justify-center px-2 py-3 sm:px-4 sm:py-5 md:mb-12"
         >
-          <div className="relative h-48 w-full max-w-[580px] md:h-[220px] md:max-w-[800px] lg:h-[260px] lg:max-w-[950px]">
+          <div
+            className="relative h-48 w-full max-w-[580px] md:h-[220px] md:max-w-[800px] lg:h-[260px] lg:max-w-[950px] [filter:drop-shadow(0_0_6px_hsl(var(--gold-bright)_/_0.55))_drop-shadow(0_0_20px_hsl(var(--gold)_/_0.35))_drop-shadow(0_0_42px_hsl(var(--gold-bright)_/_0.18))]"
+          >
             <Image
               src="/images/alpha-brasil-gold-logo.png"
               alt="Alpha Brasil"
@@ -134,7 +136,7 @@ export function HeroSection({
                             type="button"
                             onClick={() => onSizeChange(s)}
                             className={cn(
-                              "group relative flex h-12 w-12 items-center justify-center rounded-xl text-xs font-bold transition-all duration-300",
+                              "group relative flex h-12 min-w-12 items-center justify-center rounded-xl px-2 text-xs font-bold transition-all duration-300",
                               selectedSize === s
                                 ? "bg-gold text-navy-deep"
                                 : "border border-white/10 bg-white/[0.03] text-muted-foreground hover:border-gold/40"
@@ -144,15 +146,21 @@ export function HeroSection({
                           </button>
                         ))}
                       </div>
+                      <a
+                        href="#tabela-tamanhos"
+                        className="mx-auto mt-4 flex w-fit max-w-full items-center justify-center rounded-xl border border-gold/35 bg-gold/[0.1] px-4 py-2.5 text-center text-[11px] font-semibold leading-snug text-gold-bright shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-sm transition-all hover:border-gold/55 hover:bg-gold/[0.16] hover:underline hover:underline-offset-4 sm:mx-0 sm:justify-start"
+                      >
+                        Não sabe seu tamanho? Descubra agora
+                      </a>
                     </div>
                   </div>
 
                   <Button 
                     size="xl" 
                     className="shimmer-btn w-full text-sm sm:text-base font-bold uppercase tracking-tight sm:tracking-normal shadow-[0_0_30px_-5px_hsl(var(--gold)/0.4)]" 
-                    onClick={onAddToCart}
+                    onClick={onBuyNow}
                   >
-                    <ShoppingCart className="mr-3 h-5 w-5 shrink-0" />
+                    <ArrowRight className="mr-3 h-5 w-5 shrink-0" />
                     Garantir minha Edição Sagrada
                   </Button>
                 </div>

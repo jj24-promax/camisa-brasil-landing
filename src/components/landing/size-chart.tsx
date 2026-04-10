@@ -8,14 +8,18 @@ const rows = [
   { size: "M", bust: "96–100", length: "70–72", shoulder: "44–46" },
   { size: "G", bust: "100–106", length: "72–74", shoulder: "46–48" },
   { size: "GG", bust: "106–112", length: "74–76", shoulder: "48–50" },
+  { size: "G1", bust: "112–118", length: "76–78", shoulder: "50–52" },
+  { size: "G2", bust: "118–124", length: "78–80", shoulder: "52–54" },
 ];
 
 export function SizeChart() {
   return (
     <SectionShell
+      id="tabela-tamanhos"
       aria-labelledby="sizes-heading"
       variant="soft"
       grain="off"
+      className="scroll-mt-32"
       contentClassName="mx-auto max-w-4xl !px-5 md:!px-10"
     >
       <SectionReveal className="text-center">

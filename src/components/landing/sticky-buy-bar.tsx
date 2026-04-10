@@ -3,14 +3,14 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { PRODUCT } from "@/lib/product";
-import { ShoppingCart } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 type StickyBuyBarProps = {
   isVisible: boolean;
-  onAddToCart: () => void;
+  onBuyNow: () => void;
 };
 
-export function StickyBuyBar({ isVisible, onAddToCart }: StickyBuyBarProps) {
+export function StickyBuyBar({ isVisible, onBuyNow }: StickyBuyBarProps) {
   return (
     <AnimatePresence>
       {isVisible && (
@@ -31,9 +31,9 @@ export function StickyBuyBar({ isVisible, onAddToCart }: StickyBuyBarProps) {
                   {PRODUCT.priceFormatted}
                 </p>
               </div>
-              <Button size="lg" className="shrink-0 px-5 text-[11px]" onClick={onAddToCart}>
-                <ShoppingCart className="mr-2 h-4 w-4" />
-                Adicionar
+              <Button size="lg" className="shrink-0 px-5 text-[11px]" onClick={onBuyNow}>
+                <ArrowRight className="mr-2 h-4 w-4" />
+                Comprar
               </Button>
             </div>
           </div>

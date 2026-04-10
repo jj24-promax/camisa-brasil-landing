@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
-import toast from "react-hot-toast";
+import { useState, useEffect } from "react";
+import { ShoppingBag } from "lucide-react";
 import { HeroSection } from "@/components/landing/hero-section";
 import { ProductDetails } from "@/components/landing/product-details";
 import { PromoBundle } from "@/components/landing/promo-bundle";
@@ -12,18 +12,49 @@ import { SizeChart } from "@/components/landing/size-chart";
 import { FaqSection } from "@/components/landing/faq-section";
 import { FinalCta } from "@/components/landing/final-cta";
 import { StickyBuyBar } from "@/components/landing/sticky-buy-bar";
-import { SiteNavDesktop, SiteNavMobile, CartButton } from "@/components/landing/site-nav";
+import { SiteNavDesktop, SiteNavMobile } from "@/components/landing/site-nav";
 import { AnnouncementBar } from "@/components/landing/announcement-bar";
 import { SalesNotifications } from "@/components/landing/sales-notifications";
-import { CartDialog } from "@/components/purchase/cart-dialog";
-import { PRODUCT, PRODUCT_IMAGE_SRC } from "@/lib/product";
-import type { Size, CartItem } from "@/lib/types";
+import { LandingCartDialog } from "@/components/landing/landing-cart-dialog";
+import type { Size } from "@/lib/types";
 
 export default function HomePage() {
   const [selectedSize, setSelectedSize] = useState<Size>("M");
-  const [cart, setCart] = useState<CartItem[]>([]);
-  const [cartOpen, setCartOpen] = useState(false);
   const [isStickyVisible, setIsStickyVisible] = useState(false);
+  const [cartOpen, setCartOpen] = useState(false);
+  const [cartQty, setCartQty] = useState(1);
+  const [cartSizes, setCartSizes] = useState<Size[]>(["M"]);
+
+  const openCart = (quantity: number) => {
+    setCartQty(quantity);
+    setCartSizes((prev) => {
+      const next: Size[] = [];
+      for (let i = 0; i < quantity; i++) {
+        next.push(prev[i] ?? selectedSize);
+      }
+      return next;
+    });
+    setCartOpen(true);
+  };
+
+  const handleCartQtyChange = (q: number) => {
+    setCartQty(q);
+    setCartSizes((prev) => {
+      if (q === prev.length) return prev;
+      if (q > prev.length) {
+        const fill = prev[prev.length - 1] ?? selectedSize;
+        return [...prev, ...Array.from({ length: q - prev.length }, () => fill)];
+      }
+      return prev.slice(0, q);
+    });
+  };
+
+  const handleCartSizesChange = (next: Size[]) => {
+    setCartSizes(next);
+    if (next.length === 1) {
+      setSelectedSize(next[0]);
+    }
+  };
 
   // Monitora o scroll para ativar a sticky bar e as notificações
   useEffect(() => {
@@ -31,49 +62,11 @@ export default function HomePage() {
       const threshold = window.innerHeight * 0.5;
       setIsStickyVisible(window.scrollY > threshold);
     };
-    
+
     window.addEventListener("scroll", handleScroll, { passive: true });
     handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
-  const handleAddToCart = () => {
-    setCart((prevCart) => {
-      const existingItem = prevCart.find((item) => item.size === selectedSize);
-      if (existingItem) {
-        return prevCart.map((item) =>
-          item.size === selectedSize ? { ...item, quantity: item.quantity + 1 } : item
-        );
-      }
-      return [
-        ...prevCart,
-        {
-          id: `${PRODUCT.id}-${selectedSize}`,
-          name: PRODUCT.name,
-          imageSrc: PRODUCT_IMAGE_SRC,
-          priceCents: PRODUCT.priceCents,
-          priceFormatted: PRODUCT.priceFormatted,
-          size: selectedSize,
-          quantity: 1,
-        },
-      ];
-    });
-    toast.success(`${PRODUCT.shortName} (Tam: ${selectedSize}) adicionada ao carrinho!`);
-  };
-
-  const updateCartQuantity = (id: string, quantity: number) => {
-    setCart((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, quantity: Math.max(0, quantity) } : item))
-    );
-  };
-
-  const removeCartItem = (id: string) => {
-    setCart((prev) => prev.filter((item) => item.id !== id));
-  };
-
-  const cartCount = useMemo(() => {
-    return cart.reduce((sum, item) => sum + item.quantity, 0);
-  }, [cart]);
 
   return (
     <>
@@ -90,10 +83,15 @@ export default function HomePage() {
             <SiteNavDesktop />
           </div>
           <div className="ml-auto flex shrink-0 items-center gap-2 sm:gap-4">
-            <div className="hidden md:flex">
-              <CartButton onCartOpen={() => setCartOpen(true)} cartCount={cartCount} />
-            </div>
-            <SiteNavMobile onCartOpen={() => setCartOpen(true)} cartCount={cartCount} />
+            <button
+              type="button"
+              onClick={() => setCartOpen(true)}
+              className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-white/[0.08] bg-white/[0.03] text-gold/90 transition-colors hover:border-gold/30 hover:bg-white/[0.06] hover:text-gold-bright focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/40"
+              aria-label="Abrir carrinho"
+            >
+              <ShoppingBag className="h-[18px] w-[18px]" strokeWidth={1.75} />
+            </button>
+            <SiteNavMobile />
           </div>
         </div>
       </header>
@@ -102,37 +100,34 @@ export default function HomePage() {
         <HeroSection
           selectedSize={selectedSize}
           onSizeChange={setSelectedSize}
-          onAddToCart={handleAddToCart}
+          onBuyNow={() => openCart(1)}
         />
         <ProductDetails />
-        <PromoBundle onAddToCart={handleAddToCart} />
+        <PromoBundle onBuyBundle={() => openCart(3)} />
         <PremiumGallery />
         <SocialProof />
         <GuaranteeSection />
         <SizeChart />
         <FaqSection />
-        <FinalCta onAddToCart={handleAddToCart} />
+        <FinalCta onBuyNow={() => openCart(1)} />
       </main>
 
       <footer className="relative border-t border-white/[0.05] bg-gradient-to-b from-transparent to-[#04070d]/90 py-14 text-center">
-        <div className="flex justify-center gap-6 text-[12px] uppercase tracking-[0.2em] text-muted-foreground">
-          <a href="#" className="transition-colors hover:text-gold">Envios</a>
-          <a href="#" className="transition-colors hover:text-gold">Trocas</a>
-          <a href="#" className="transition-colors hover:text-gold">Contacto</a>
-        </div>
-        <p className="mt-8 text-[12px] uppercase tracking-[0.28em] text-muted-foreground">
+        <p className="text-[12px] uppercase tracking-[0.28em] text-muted-foreground">
           © {new Date().getFullYear()} Alpha Brasil
         </p>
       </footer>
 
-      <StickyBuyBar isVisible={isStickyVisible} onAddToCart={handleAddToCart} />
+      <StickyBuyBar isVisible={isStickyVisible} onBuyNow={() => openCart(1)} />
       <SalesNotifications isVisible={isStickyVisible} />
-      <CartDialog
+
+      <LandingCartDialog
         open={cartOpen}
         onOpenChange={setCartOpen}
-        items={cart}
-        updateQuantity={updateCartQuantity}
-        removeItem={removeCartItem}
+        quantity={cartQty}
+        onQuantityChange={handleCartQtyChange}
+        sizes={cartSizes}
+        onSizesChange={handleCartSizesChange}
       />
     </>
   );

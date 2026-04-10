@@ -17,15 +17,28 @@ import { Maximize2 } from "lucide-react";
 
 type GalleryItem = (typeof GALLERY_IMAGES)[number];
 
-function isGalleryVideo(item: GalleryItem): item is Extract<
-  GalleryItem,
-  { kind: "video" }
-> {
-  return "kind" in item && item.kind === "video";
+type GalleryVideoItem = {
+  webmSrc: string;
+  mp4Src: string;
+  posterSrc: string;
+  alt: string;
+};
+
+/** Quando existir item de vídeo no array, este guard devolve os campos tipados. */
+function asVideoItem(item: GalleryItem): GalleryVideoItem | null {
+  if (
+    "webmSrc" in item &&
+    "mp4Src" in item &&
+    "posterSrc" in item &&
+    typeof (item as { webmSrc?: unknown }).webmSrc === "string"
+  ) {
+    return item as GalleryVideoItem;
+  }
+  return null;
 }
 
 function galleryThumbSrc(item: GalleryItem): string {
-  return isGalleryVideo(item) ? item.posterSrc : item.src;
+  return asVideoItem(item)?.posterSrc ?? item.src;
 }
 
 export function PremiumGallery() {
@@ -36,7 +49,8 @@ export function PremiumGallery() {
   const lightboxVideoRef = useRef<HTMLVideoElement | null>(null);
 
   const activeItem = GALLERY_IMAGES[active];
-  const galleryVideoActive = isGalleryVideo(activeItem);
+  const activeVideo = asVideoItem(activeItem);
+  const galleryVideoActive = activeVideo !== null;
 
   useVideoBoomerangLoop({
     videoRef,
@@ -54,7 +68,7 @@ export function PremiumGallery() {
   }, [galleryVideoActive, reduced, active]);
 
   useEffect(() => {
-    if (!lightboxOpen || !isGalleryVideo(activeItem)) return;
+    if (!lightboxOpen || !asVideoItem(activeItem)) return;
     const v = lightboxVideoRef.current;
     if (!v) return;
     v.muted = true;
@@ -106,21 +120,21 @@ export function PremiumGallery() {
               transition={{ duration: 0.4 }}
               className="absolute inset-0"
             >
-              {isGalleryVideo(activeItem) ? (
+              {activeVideo ? (
                 <video
                   ref={videoRef}
-                  key={activeItem.webmSrc}
+                  key={activeVideo.webmSrc}
                   className="h-full w-full object-cover object-center"
                   muted
                   loop={!!reduced}
                   playsInline
                   autoPlay={!!reduced}
                   preload="auto"
-                  poster={activeItem.posterSrc}
-                  aria-label={activeItem.alt}
+                  poster={activeVideo.posterSrc}
+                  aria-label={activeVideo.alt}
                 >
-                  <source src={activeItem.webmSrc} type="video/webm" />
-                  <source src={activeItem.mp4Src} type="video/mp4" />
+                  <source src={activeVideo.webmSrc} type="video/webm" />
+                  <source src={activeVideo.mp4Src} type="video/mp4" />
                 </video>
               ) : (
                 <Image
@@ -157,22 +171,22 @@ export function PremiumGallery() {
               Visualização ampliada para ver textura e detalhes da peça.
             </DialogDescription>
             <div className="relative flex min-h-0 w-full flex-1 items-center justify-center">
-              {isGalleryVideo(activeItem) ? (
+              {activeVideo ? (
                 <video
                   ref={lightboxVideoRef}
-                  key={`lb-${active}-${activeItem.webmSrc}`}
+                  key={`lb-${active}-${activeVideo.webmSrc}`}
                   className="mx-auto max-h-[min(82dvh,860px)] w-full max-w-full object-contain object-center"
                   muted
                   loop
                   playsInline
                   autoPlay
                   preload="auto"
-                  poster={activeItem.posterSrc}
+                  poster={activeVideo.posterSrc}
                   controls
-                  aria-label={activeItem.alt}
+                  aria-label={activeVideo.alt}
                 >
-                  <source src={activeItem.webmSrc} type="video/webm" />
-                  <source src={activeItem.mp4Src} type="video/mp4" />
+                  <source src={activeVideo.webmSrc} type="video/webm" />
+                  <source src={activeVideo.mp4Src} type="video/mp4" />
                 </video>
               ) : (
                 <div className="relative mx-auto h-[min(82dvh,860px)] w-full max-w-full">

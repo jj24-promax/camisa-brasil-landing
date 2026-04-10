@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Menu, ShoppingCart } from "lucide-react";
+import { Menu } from "lucide-react";
 import {
   Dialog,
   DialogClose,
@@ -55,15 +55,9 @@ export function SiteNavDesktop() {
   );
 }
 
-type SiteNavMobileProps = {
-  onCartOpen: () => void;
-  cartCount: number;
-};
-
-export function SiteNavMobile({ onCartOpen, cartCount }: SiteNavMobileProps) {
+export function SiteNavMobile() {
   return (
     <div className="flex items-center gap-2 md:hidden">
-      <CartButton onCartOpen={onCartOpen} cartCount={cartCount} />
       <Dialog>
         <DialogTrigger asChild>
           <button
@@ -100,28 +94,5 @@ export function SiteNavMobile({ onCartOpen, cartCount }: SiteNavMobileProps) {
         </DialogContent>
       </Dialog>
     </div>
-  );
-}
-
-type CartButtonProps = {
-  onCartOpen: () => void;
-  cartCount: number;
-};
-
-export function CartButton({ onCartOpen, cartCount }: CartButtonProps) {
-  return (
-    <button
-      type="button"
-      onClick={onCartOpen}
-      className="relative inline-flex h-10 w-10 items-center justify-center rounded-xl border border-white/[0.08] bg-white/[0.03] text-[hsl(215,14%,70%)] transition-colors hover:border-white/15 hover:bg-white/[0.06] hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/40"
-      aria-label={`Ver carrinho (${cartCount} ${cartCount === 1 ? "item" : "itens"})`}
-    >
-      <ShoppingCart className="h-[18px] w-[18px]" strokeWidth={1.5} />
-      {cartCount > 0 && (
-        <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-gold-bright text-[9px] font-bold text-navy-deep">
-          {cartCount}
-        </span>
-      )}
-    </button>
   );
 }

@@ -92,6 +92,8 @@ const reviews = [
   },
 ];
 
+type ReviewEntry = (typeof reviews)[number];
+
 function Stars({ n }: { n: number }) {
   return (
     <div className="flex gap-0.5" aria-label={`${n} de 5 estrelas`}>
@@ -116,7 +118,7 @@ function ReviewMarquee({
   reviews,
   reverse = false,
 }: {
-  reviews: (typeof reviews)[number][];
+  reviews: ReviewEntry[];
   reverse?: boolean;
 }) {
   return (

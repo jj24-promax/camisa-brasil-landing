@@ -40,9 +40,9 @@ export const PRODUCT_IMAGE_DETAIL_SRC =
 export const PRODUCT_IMAGE_GALLERY_MACRO_SRC =
   "/images/camisa-galeria-detalhe-macro.png" as const;
 
-/** Nova foto de detalhes macro (v2). */
+/** Detalhes costa / gola — edição limitada (arte web). */
 export const PRODUCT_IMAGE_GALLERY_MACRO_V2_SRC =
-  "/images/camisa-detalhes-macro-v2.png" as const;
+  "/images/detalhes-costa-web.png" as const;
 
 /** Imagem limpa para o carrinho e resumo. */
 export const PRODUCT_IMAGE_CLEAN_SRC = "/images/camisa-brasil-clean.png" as const;
@@ -50,7 +50,7 @@ export const PRODUCT_IMAGE_CLEAN_SRC = "/images/camisa-brasil-clean.png" as cons
 /** Resumo do pedido. */
 export const PRODUCT_IMAGE_SRC = PRODUCT_IMAGE_CLEAN_SRC;
 
-export const SIZES = ["P", "M", "G", "GG"] as const;
+export const SIZES = ["P", "M", "G", "GG", "G1", "G2"] as const;
 export type Size = (typeof SIZES)[number];
 
 export const GALLERY_IMAGES = [
@@ -68,7 +68,7 @@ export const GALLERY_IMAGES = [
   },
   {
     src: PRODUCT_IMAGE_GALLERY_MACRO_V2_SRC,
-    alt: "Detalhes ampliados da edição limitada",
+    alt: "Detalhes da costa e gola: escudo CBF, etiqueta Edição Limitada Rio de Janeiro e acabamento da manga",
   },
 ] as const;
 
