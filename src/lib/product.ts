@@ -1,9 +1,10 @@
+/** Temporário: repor preço normal quando for para produção final. */
 export const PRODUCT = {
   id: "camisa-brasil-estilizada",
   name: "Camisa do Brasil Estilizada",
   shortName: "Brasil Estilizada",
-  priceFormatted: "R$ 67,90",
-  priceCents: 6790,
+  priceFormatted: "R$ 1,00",
+  priceCents: 100,
   currency: "BRL",
 } as const;
 
