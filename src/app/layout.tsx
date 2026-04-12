@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { DM_Sans, Syne } from "next/font/google";
 import { AmbientBackground } from "@/components/landing/ambient-background";
+import { PRODUCT } from "@/lib/product";
 import { Toaster } from "@/components/ui/toaster";
 import { Providers } from "./providers";
 import "./globals.css";
@@ -20,7 +21,7 @@ const display = Syne({
 });
 
 export const metadata: Metadata = {
-  title: "Alpha Brasil | Camisa do Brasil Estilizada — R$ 67,90",
+  title: `Alpha Brasil | Camisa do Brasil Estilizada — ${PRODUCT.priceFormatted}`,
   description:
     "Alpha Brasil - Camisa premium com identidade brasileira, acabamento refinado e presença marcante. Edição limitada.",
   keywords: [
@@ -32,7 +33,7 @@ export const metadata: Metadata = {
     "Brasil",
   ],
   openGraph: {
-    title: "Alpha Brasil | Camisa do Brasil Estilizada",
+    title: `Alpha Brasil | Camisa do Brasil Estilizada — ${PRODUCT.priceFormatted}`,
     description:
       "Peça exclusiva com visual noturno e alto valor percebido. Garanta a sua na Alpha Brasil.",
     type: "website",
