@@ -87,7 +87,12 @@ Content-Type: application/json
 
 ## Webhook (`callbackUrl`)
 
-Documentar à parte (formato do body, assinatura/HMAC, retries), conforme manual Royal Banking — este ficheiro cobre apenas o **Cash In** síncrono.
+O projeto expõe `POST /api/webhooks/royalbanking/pix`. Quando o payload é interpretado como **pago** (`src/lib/royalbanking-webhook-parse.ts`), grava-se `status = paid` na tabela `pix_gateway_payments` (Supabase, **service role**). O checkout consulta `GET /api/pix/payment-status` até o botão “Continuar” ser libertado.
+
+1. Na Vercel: `SUPABASE_SERVICE_ROLE_KEY` + SQL em `docs/supabase-pix-payments.sql`.
+2. Se o webhook da Royal Banking tiver outro formato, ajuste `parseRoyalBankingPixWebhook` para detetar `idTransaction` e estado pago.
+
+Documentar assinatura/HMAC e retries conforme manual Royal Banking — este ficheiro cobre o **Cash In** síncrono e o fluxo acima.
 
 ## Onde colocar a API Key (este projeto Next.js)
 

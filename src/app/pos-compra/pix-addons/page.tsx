@@ -11,6 +11,7 @@ import { extractPixGatewayPayload, qrDataUrlForImg } from "@/lib/pix-gateway-res
 import { readPosCompraPixClient } from "@/lib/pos-compra-pix-storage";
 import { computeUpsellAddonCents, UPSELL_CARD_CENTS, UPSELL_VIP_CENTS } from "@/lib/pos-compra-upsell-pricing";
 import { posCompraObrigadoQuery } from "@/lib/pos-compra-routes";
+import { usePixPaymentConfirmation } from "@/hooks/use-pix-payment-confirmation";
 
 type PixState = {
   paymentCode: string;
@@ -39,6 +40,16 @@ function PixAddonsContent() {
     () => (pixResult?.paymentCodeBase64 ? qrDataUrlForImg(pixResult.paymentCodeBase64) : null),
     [pixResult?.paymentCodeBase64]
   );
+
+  const { confirmed: pixPaymentConfirmed, trackingAvailable: pixTrackingAvailable } =
+    usePixPaymentConfirmation(pixResult?.idTransaction);
+
+  const pixAwaitingConfirm = pixResult != null;
+  const pixMissingTransactionId = pixAwaitingConfirm && !(pixResult?.idTransaction ?? "").trim();
+  const pixContinueDisabled =
+    loading ||
+    (pixAwaitingConfirm &&
+      (pixMissingTransactionId || !pixTrackingAvailable || !pixPaymentConfirmed));
 
   useEffect(() => {
     if (addonCents === 0) {
@@ -272,14 +283,54 @@ function PixAddonsContent() {
         )}
 
         {!loading && pixResult != null && (
-          <Button
-            type="button"
-            size="xl"
-            className="mt-10 w-full font-bold uppercase tracking-[0.12em]"
-            onClick={() => router.push(posCompraObrigadoQuery(vip, card))}
-          >
-            Continuar para confirmação
-          </Button>
+          <div className="mt-10 space-y-3">
+            {pixMissingTransactionId ? (
+              <p className="text-center text-[10px] leading-snug text-amber-200/90">
+                Sem referência da transação — não é possível confirmar o Pix automaticamente.
+              </p>
+            ) : pixResult.idTransaction ? (
+              !pixTrackingAvailable ? (
+                <p className="text-center text-[10px] leading-snug text-amber-200/90">
+                  Confirmação automática: configure{" "}
+                  <code className="rounded bg-black/30 px-1 text-[9px]">SUPABASE_SERVICE_ROLE_KEY</code> e{" "}
+                  <code className="rounded bg-black/30 px-1 text-[9px]">docs/supabase-pix-payments.sql</code>.
+                </p>
+              ) : !pixPaymentConfirmed ? (
+                <p className="text-center text-[10px] font-semibold uppercase tracking-widest text-gold-bright/90">
+                  À espera da confirmação do pagamento…
+                </p>
+              ) : (
+                <p className="text-center text-[10px] font-semibold uppercase tracking-widest text-emerald-400/90">
+                  Pagamento confirmado — pode continuar.
+                </p>
+              )
+            ) : null}
+            <Button
+              type="button"
+              size="xl"
+              disabled={pixContinueDisabled}
+              className="w-full font-bold uppercase tracking-[0.12em] disabled:opacity-60"
+              onClick={() => {
+                if (pixMissingTransactionId) {
+                  toast.error("Sem identificador da transação para confirmar o Pix.");
+                  return;
+                }
+                if (!pixTrackingAvailable) {
+                  toast.error(
+                    "Confirmação automática indisponível. Configure SUPABASE_SERVICE_ROLE_KEY e a tabela no Supabase."
+                  );
+                  return;
+                }
+                if (!pixPaymentConfirmed) {
+                  toast.error("Aguarde a confirmação do Pix antes de continuar.");
+                  return;
+                }
+                router.push(posCompraObrigadoQuery(vip, card));
+              }}
+            >
+              Continuar para confirmação
+            </Button>
+          </div>
         )}
       </main>
     </motion.div>

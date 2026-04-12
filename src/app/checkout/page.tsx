@@ -38,6 +38,7 @@ import {
   useRetentionDiscountOnTotal,
   useRetentionBannerCountdown,
 } from "@/hooks/use-checkout-retention";
+import { usePixPaymentConfirmation } from "@/hooks/use-pix-payment-confirmation";
 import { extractPixGatewayPayload, qrDataUrlForImg } from "@/lib/pix-gateway-response";
 import { savePosCompraPixClient } from "@/lib/pos-compra-pix-storage";
 
@@ -207,6 +208,9 @@ function CheckoutContent() {
     [pixResult?.paymentCodeBase64]
   );
 
+  const { confirmed: pixPaymentConfirmed, trackingAvailable: pixTrackingAvailable } =
+    usePixPaymentConfirmation(pixResult?.idTransaction);
+
   const searchParams = useSearchParams();
   const rawQ = parseInt(searchParams.get("q") || "1", 10);
   const quantity = Number.isFinite(rawQ) && rawQ > 0 ? rawQ : 1;
@@ -267,6 +271,14 @@ function CheckoutContent() {
   const retention = useRetentionDiscountOnTotal(pricing.baseTotalCents);
   const finalTotalCents = pricing.baseTotalCents - retention.discountCents;
   const retentionBannerLeft = useRetentionBannerCountdown(retention.untilMs);
+
+  const pixAwaitingConfirm = paymentMethod === "pix" && pixResult != null;
+  const pixMissingTransactionId = pixAwaitingConfirm && !(pixResult?.idTransaction ?? "").trim();
+  const pixContinueDisabled =
+    pixLoading ||
+    cardSubmitting ||
+    (pixAwaitingConfirm &&
+      (pixMissingTransactionId || !pixTrackingAvailable || !pixPaymentConfirmed));
 
   /** Só envia à raiz se o 30% de retenção já foi aceite e ainda está válido (faixa dourada). Caso contrário: sempre `/checkout/retencao`. */
   const headerBackGoesHome = retention.active;
@@ -376,6 +388,22 @@ function CheckoutContent() {
     }
 
     if (pixResult != null) {
+      if (pixMissingTransactionId) {
+        toast.error(
+          "O Pix foi gerado sem identificador da transação (Ref.). Não é possível confirmar o pagamento automaticamente — contacte o suporte da gateway."
+        );
+        return;
+      }
+      if (!pixTrackingAvailable) {
+        toast.error(
+          "Confirmação automática indisponível: defina SUPABASE_SERVICE_ROLE_KEY na Vercel e execute docs/supabase-pix-payments.sql no Supabase."
+        );
+        return;
+      }
+      if (!pixPaymentConfirmed) {
+        toast.error("Aguarde a confirmação do Pix antes de continuar.");
+        return;
+      }
       savePosCompraPixClient({
         name: formData.name.trim(),
         email: formData.email.trim().toLowerCase(),
@@ -877,6 +905,29 @@ function CheckoutContent() {
                     <p className="text-center text-[9px] text-muted-foreground">
                       Ref. {pixResult.idTransaction}
                     </p>
+                  ) : (
+                    <p className="text-center text-[10px] leading-snug text-amber-200/90">
+                      Sem referência da transação na resposta da gateway — não é possível confirmar o pagamento automaticamente.
+                    </p>
+                  )}
+                  {pixAwaitingConfirm && pixResult.idTransaction ? (
+                    !pixTrackingAvailable ? (
+                      <p className="text-center text-[10px] leading-snug text-amber-200/90">
+                        Para libertar o botão após o Pix: configure{" "}
+                        <code className="rounded bg-black/30 px-1 py-0.5 text-[9px]">SUPABASE_SERVICE_ROLE_KEY</code> na
+                        Vercel e rode o SQL em{" "}
+                        <code className="rounded bg-black/30 px-1 py-0.5 text-[9px]">docs/supabase-pix-payments.sql</code>{" "}
+                        no Supabase.
+                      </p>
+                    ) : !pixPaymentConfirmed ? (
+                      <p className="text-center text-[10px] font-semibold uppercase tracking-widest text-gold-bright/90">
+                        À espera da confirmação do pagamento…
+                      </p>
+                    ) : (
+                      <p className="text-center text-[10px] font-semibold uppercase tracking-widest text-emerald-400/90">
+                        Pagamento confirmado — pode continuar.
+                      </p>
+                    )
                   ) : null}
                 </div>
               )}
@@ -884,7 +935,7 @@ function CheckoutContent() {
               <Button
                 size="xl"
                 onClick={handleFinalize}
-                disabled={pixLoading || cardSubmitting}
+                disabled={pixContinueDisabled}
                 className="shimmer-btn w-full font-bold uppercase tracking-widest py-8 rounded-2xl disabled:opacity-60"
               >
                 {cardSubmitting ? (
