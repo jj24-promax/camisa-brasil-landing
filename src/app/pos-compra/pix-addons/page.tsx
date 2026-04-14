@@ -134,7 +134,17 @@ function PixAddonsContent() {
           },
         }),
       });
-      const raw = (await res.json()) as Record<string, unknown>;
+      const text = await res.text();
+      let raw: Record<string, unknown>;
+      try {
+        raw = text.trim() ? (JSON.parse(text) as Record<string, unknown>) : {};
+      } catch {
+        throw new Error(
+          res.status >= 500
+            ? `Erro ${res.status} no servidor (resposta não JSON).`
+            : "Resposta inválida do servidor ao gerar Pix."
+        );
+      }
       if (!res.ok) {
         const msg =
           typeof raw.error === "string"

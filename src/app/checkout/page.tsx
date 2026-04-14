@@ -604,7 +604,17 @@ function CheckoutContent() {
         }),
       });
 
-      const raw = (await res.json()) as Record<string, unknown>;
+      const text = await res.text();
+      let raw: Record<string, unknown>;
+      try {
+        raw = text.trim() ? (JSON.parse(text) as Record<string, unknown>) : {};
+      } catch {
+        throw new Error(
+          res.status >= 500
+            ? `Erro ${res.status} no servidor ao gerar Pix (resposta não JSON). Confirme logs na Vercel e variáveis de ambiente.`
+            : "Resposta inválida do servidor ao gerar Pix."
+        );
+      }
       const data = extractPixGatewayPayload(raw);
 
       if (!res.ok) {

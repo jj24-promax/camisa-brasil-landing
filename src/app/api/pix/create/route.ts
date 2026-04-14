@@ -70,6 +70,7 @@ function resolveCallbackUrl(): string | null {
 }
 
 export async function POST(request: Request) {
+  try {
   const apiKey = process.env.ROYALBANKING_API_KEY;
   const callbackUrl = resolveCallbackUrl();
 
@@ -231,10 +232,25 @@ export async function POST(request: Request) {
     }
   }
 
-  return NextResponse.json({
+  const pixResponseBody: Record<string, unknown> = {
     ...obj,
     paymentCode: normalized.paymentCode,
     paymentCodeBase64: normalized.paymentCodeBase64,
     ...(normalized.idTransaction ? { idTransaction: normalized.idTransaction } : {}),
-  });
+  };
+  try {
+    JSON.stringify(pixResponseBody);
+  } catch {
+    return NextResponse.json({
+      paymentCode: normalized.paymentCode,
+      paymentCodeBase64: normalized.paymentCodeBase64,
+      ...(normalized.idTransaction ? { idTransaction: normalized.idTransaction } : {}),
+    });
+  }
+  return NextResponse.json(pixResponseBody);
+  } catch (e) {
+    console.error("[pix/create]", e);
+    const message = e instanceof Error ? e.message : "Erro interno ao criar Pix.";
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
 }
