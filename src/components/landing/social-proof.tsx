@@ -27,6 +27,8 @@ type ReviewPhotoEntry = {
   rating: 5;
   profileImageSrc: string;
   imageSrc: string;
+  /** `table` = camisa/produto (ex. mesa); `person` = pessoa vestindo — intercalados no carrossel. */
+  photoKind: "table" | "person";
 };
 
 /** Fotos reais de clientes (UGC) — mesmo cartão que o restante do carrossel. */
@@ -37,6 +39,7 @@ const ugcReviewPhotos: ReviewPhotoEntry[] = [
     rating: 5,
     profileImageSrc: "/images/testimonials/profiles/ricardo-h.png",
     imageSrc: "/images/testimonials/ugc/ugc-1.png",
+    photoKind: "person",
   },
   {
     name: "Bruno T.",
@@ -44,6 +47,7 @@ const ugcReviewPhotos: ReviewPhotoEntry[] = [
     rating: 5,
     profileImageSrc: "/images/testimonials/profiles/bruno-t.png",
     imageSrc: "/images/testimonials/ugc/ugc-2.png",
+    photoKind: "person",
   },
   {
     name: "Letícia M.",
@@ -51,6 +55,7 @@ const ugcReviewPhotos: ReviewPhotoEntry[] = [
     rating: 5,
     profileImageSrc: "/images/testimonials/profiles/leticia-m.png",
     imageSrc: "/images/testimonials/ugc/ugc-3.png",
+    photoKind: "person",
   },
   {
     name: "Camila R.",
@@ -58,6 +63,7 @@ const ugcReviewPhotos: ReviewPhotoEntry[] = [
     rating: 5,
     profileImageSrc: reviewPortraitWoman(59),
     imageSrc: "/images/testimonials/ugc/ugc-4.png",
+    photoKind: "person",
   },
   {
     name: "Vinícius K.",
@@ -65,6 +71,23 @@ const ugcReviewPhotos: ReviewPhotoEntry[] = [
     rating: 5,
     profileImageSrc: reviewPortraitMan(63),
     imageSrc: "/images/testimonials/ugc/ugc-5.png",
+    photoKind: "person",
+  },
+  {
+    name: "Matheus L.",
+    text: "Comprei para presente e meu amigo gostou muito.",
+    rating: 5,
+    profileImageSrc: "/images/testimonials/profiles/matheus-l.png",
+    imageSrc: "/images/testimonials/ugc/ugc-6.png",
+    photoKind: "person",
+  },
+  {
+    name: "Priscila T.",
+    text: "Levei na feira no fim de semana — confortável, linda e diferente das camisas comuns.",
+    rating: 5,
+    profileImageSrc: "/images/testimonials/profiles/priscila-t.png",
+    imageSrc: "/images/testimonials/ugc/ugc-7.png",
+    photoKind: "person",
   },
 ];
 
@@ -75,6 +98,7 @@ const stockReviewPhotos: ReviewPhotoEntry[] = [
     rating: 5,
     profileImageSrc: reviewPortraitMan(11),
     imageSrc: "/images/testimonials/1.png",
+    photoKind: "table",
   },
   {
     name: "Juliana C.",
@@ -82,6 +106,7 @@ const stockReviewPhotos: ReviewPhotoEntry[] = [
     rating: 5,
     profileImageSrc: reviewPortraitWoman(14),
     imageSrc: "/images/testimonials/2.png",
+    photoKind: "table",
   },
   {
     name: "Diego A.",
@@ -89,6 +114,7 @@ const stockReviewPhotos: ReviewPhotoEntry[] = [
     rating: 5,
     profileImageSrc: reviewPortraitMan(18),
     imageSrc: "/images/testimonials/3.png",
+    photoKind: "table",
   },
   {
     name: "Beatriz L.",
@@ -96,6 +122,7 @@ const stockReviewPhotos: ReviewPhotoEntry[] = [
     rating: 5,
     profileImageSrc: reviewPortraitWoman(22),
     imageSrc: "/images/testimonials/4.png",
+    photoKind: "table",
   },
   {
     name: "Lucas S.",
@@ -103,6 +130,7 @@ const stockReviewPhotos: ReviewPhotoEntry[] = [
     rating: 5,
     profileImageSrc: reviewPortraitMan(25),
     imageSrc: "/images/testimonials/5.png",
+    photoKind: "table",
   },
   {
     name: "Fernanda O.",
@@ -110,6 +138,7 @@ const stockReviewPhotos: ReviewPhotoEntry[] = [
     rating: 5,
     profileImageSrc: reviewPortraitWoman(28),
     imageSrc: "/images/testimonials/6.png",
+    photoKind: "table",
   },
   {
     name: "Carlos E.",
@@ -117,6 +146,7 @@ const stockReviewPhotos: ReviewPhotoEntry[] = [
     rating: 5,
     profileImageSrc: reviewPortraitMan(31),
     imageSrc: "/images/testimonials/7.png",
+    photoKind: "table",
   },
   {
     name: "Isabela P.",
@@ -124,6 +154,7 @@ const stockReviewPhotos: ReviewPhotoEntry[] = [
     rating: 5,
     profileImageSrc: reviewPortraitWoman(35),
     imageSrc: "/images/testimonials/8.png",
+    photoKind: "table",
   },
   {
     name: "Gustavo F.",
@@ -131,6 +162,7 @@ const stockReviewPhotos: ReviewPhotoEntry[] = [
     rating: 5,
     profileImageSrc: reviewPortraitMan(38),
     imageSrc: "/images/testimonials/9.png",
+    photoKind: "table",
   },
   {
     name: "Ana B.",
@@ -138,6 +170,7 @@ const stockReviewPhotos: ReviewPhotoEntry[] = [
     rating: 5,
     profileImageSrc: reviewPortraitWoman(42),
     imageSrc: "/images/testimonials/10.png",
+    photoKind: "table",
   },
   {
     name: "Thiago R.",
@@ -145,6 +178,7 @@ const stockReviewPhotos: ReviewPhotoEntry[] = [
     rating: 5,
     profileImageSrc: reviewPortraitMan(45),
     imageSrc: "/images/testimonials/11.png",
+    photoKind: "table",
   },
   {
     name: "Catarina V.",
@@ -152,20 +186,41 @@ const stockReviewPhotos: ReviewPhotoEntry[] = [
     rating: 5,
     profileImageSrc: reviewPortraitWoman(49),
     imageSrc: "/images/testimonials/12.png",
+    photoKind: "table",
   },
 ];
 
-/** Intercala stock + UGC antes do shuffle para não agrupar várias selfies seguidas (efeito “grelha repetida”). */
-function interleaveStockAndUgc(
-  stock: readonly ReviewPhotoEntry[],
-  ugc: readonly ReviewPhotoEntry[]
+/**
+ * Ordena para alternar foto de produto (mesa) e foto com pessoa, evitando dois “corpo” seguidos no marquee.
+ * Quando um dos lados acaba, entram só cartões do outro tipo (inevitável).
+ */
+function interleaveTableAndPerson(
+  tables: ReviewPhotoEntry[],
+  persons: ReviewPhotoEntry[]
 ): ReviewPhotoEntry[] {
+  const t = [...tables];
+  const p = [...persons];
   const out: ReviewPhotoEntry[] = [];
-  const n = Math.max(stock.length, ugc.length);
-  for (let i = 0; i < n; i++) {
-    if (i < stock.length) out.push(stock[i]);
-    if (i < ugc.length) out.push(ugc[i]);
+  let last: "table" | "person" | null = null;
+
+  const take = (kind: "table" | "person") => {
+    const pool = kind === "table" ? t : p;
+    if (!pool.length) return false;
+    out.push(pool.shift()!);
+    last = kind;
+    return true;
+  };
+
+  while (t.length > 0 || p.length > 0) {
+    if (last === "table") {
+      if (!take("person")) take("table");
+    } else if (last === "person") {
+      if (!take("table")) take("person");
+    } else if (!take("table")) {
+      take("person");
+    }
   }
+
   return out;
 }
 
@@ -180,11 +235,19 @@ function dedupeByImageSrc(entries: readonly ReviewPhotoEntry[]): ReviewPhotoEntr
   return out;
 }
 
-/** Ordem estável entre builds; sem `imageSrc` repetido. */
-const reviews = shuffleDeterministic(
-  dedupeByImageSrc(interleaveStockAndUgc(stockReviewPhotos, ugcReviewPhotos)),
-  0x414c5048 /* "ALPH" */
-);
+/** Sem `imageSrc` repetido; mesa ↔ pessoa intercalados (variação dentro de cada grupo com seed fixo). */
+const reviews = (() => {
+  const all = dedupeByImageSrc([...stockReviewPhotos, ...ugcReviewPhotos]);
+  const tables = shuffleDeterministic(
+    all.filter((e) => e.photoKind === "table"),
+    0x5441424c /* "TABL" */
+  );
+  const persons = shuffleDeterministic(
+    all.filter((e) => e.photoKind === "person"),
+    0x50455253 /* "PERS" */
+  );
+  return interleaveTableAndPerson(tables, persons);
+})();
 
 type ReviewEntry = (typeof reviews)[number];
 
@@ -240,8 +303,12 @@ function ReviewMarquee({
                 src={r.imageSrc}
                 alt={`Foto do produto enviada por ${r.name}`}
                 fill
-                className="object-cover"
+                className={cn(
+                  "object-cover",
+                  r.photoKind === "person" && "object-[center_22%]"
+                )}
                 sizes="(max-width: 768px) 80vw, 340px"
+                loading="lazy"
               />
             </div>
             <div className="p-6">
@@ -253,6 +320,7 @@ function ReviewMarquee({
                     fill
                     className="object-cover"
                     sizes="48px"
+                    loading="lazy"
                   />
                 </div>
                 <div>

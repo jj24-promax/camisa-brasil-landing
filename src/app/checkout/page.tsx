@@ -935,7 +935,14 @@ function CheckoutContent() {
                           className="flex w-full min-w-0 items-center gap-4 p-4 text-left"
                         >
                           <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl border border-white/10">
-                            <Image src={bump.image} alt={bump.title} fill className="object-cover" sizes="64px" />
+                            <Image
+                              src={bump.image}
+                              alt={bump.title}
+                              fill
+                              className="object-cover"
+                              sizes="64px"
+                              loading="lazy"
+                            />
                           </div>
                           <div className="min-w-0 flex-1">
                             <h4 className="text-sm font-bold text-white">{bump.title}</h4>

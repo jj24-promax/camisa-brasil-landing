@@ -141,19 +141,12 @@ function CarrinhoContent() {
             <div className="relative mx-auto aspect-square w-full max-w-[200px] shrink-0 overflow-hidden rounded-2xl border border-white/10 sm:mx-0">
 
               <Image
-
                 src={PRODUCT_IMAGE_CLEAN_SRC}
-
                 alt={PRODUCT.name}
-
                 fill
-
                 className="object-cover"
-
                 sizes="200px"
-
-                priority
-
+                loading="lazy"
               />
 
             </div>

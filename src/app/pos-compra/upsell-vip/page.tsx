@@ -31,6 +31,7 @@ export default function UpsellVipPage() {
             fill
             className="z-0 object-cover object-center opacity-[0.2]"
             sizes="(max-width: 768px) 100vw, 480px"
+            loading="lazy"
           />
           <div className="absolute inset-0 z-[1] bg-gradient-to-br from-gold/20 via-[#04070d]/85 to-[#04070d]" />
           <div className="absolute inset-0 z-[2] flex flex-col items-center justify-center gap-4 p-8">

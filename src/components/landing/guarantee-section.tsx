@@ -44,11 +44,13 @@ export function GuaranteeSection() {
                 Compra 100% Segura
               </div>
               <h2 className="font-display text-[clamp(1.75rem,4vw,2.5rem)] font-bold leading-tight tracking-tight text-white">
-                Sua satisfação é o <br/>
-                <span className="bg-gradient-to-r from-gold-bright to-gold-muted bg-clip-text text-transparent">nosso compromisso</span>.
+                Experimente em casa. <br/>
+                <span className="bg-gradient-to-r from-gold-bright to-gold-muted bg-clip-text text-transparent">Risco zero</span> para você.
               </h2>
               <p className="mt-6 text-base leading-relaxed text-muted-foreground md:text-lg">
-                Temos tanta confiança na qualidade da nossa <span className="text-white font-medium">Edição Sagrada</span> que oferecemos uma garantia blindada. Se por qualquer motivo você não se apaixonar pela peça em até 7 dias, nós devolvemos 100% do seu investimento. 
+                Não é letra miúda: é o benefício que tira o medo de comprar online. Vista a{" "}
+                <span className="text-white font-medium">Edição Sagrada</span> no conforto da sua casa. Se não amar em até{" "}
+                <span className="text-white font-medium">7 dias</span>, devolvemos 100% do seu dinheiro — sem enrolação.
               </p>
               
               <div className="mt-8 flex flex-wrap justify-center lg:justify-start gap-4 md:gap-8">

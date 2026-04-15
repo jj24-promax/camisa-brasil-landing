@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { DM_Sans, Syne } from "next/font/google";
 import { AmbientBackground } from "@/components/landing/ambient-background";
 import { PRODUCT } from "@/lib/product";
+import { getSiteBaseUrl } from "@/lib/site-url";
 import { Toaster } from "@/components/ui/toaster";
 import { Providers } from "./providers";
 import "./globals.css";
@@ -21,9 +22,13 @@ const display = Syne({
 });
 
 export const metadata: Metadata = {
-  title: `Alpha Brasil | Camisa do Brasil Estilizada — ${PRODUCT.priceFormatted}`,
+  metadataBase: new URL(getSiteBaseUrl()),
+  title: {
+    default: `Alpha Brasil | ${PRODUCT.name} — ${PRODUCT.priceFormatted}`,
+    template: "%s | Alpha Brasil",
+  },
   description:
-    "Alpha Brasil - Camisa premium com identidade brasileira, acabamento refinado e presença marcante. Edição limitada.",
+    "Alpha Brasil — camisa premium com identidade brasileira, jacquard e acabamento de coleção. Garantia de 7 dias e compra segura.",
   keywords: [
     "Alpha Brasil",
     "camisa Brasil",
@@ -33,7 +38,7 @@ export const metadata: Metadata = {
     "Brasil",
   ],
   openGraph: {
-    title: `Alpha Brasil | Camisa do Brasil Estilizada — ${PRODUCT.priceFormatted}`,
+    title: `Alpha Brasil | ${PRODUCT.name}`,
     description:
       "Peça exclusiva com visual noturno e alto valor percebido. Garanta a sua na Alpha Brasil.",
     type: "website",

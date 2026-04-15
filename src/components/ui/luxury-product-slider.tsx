@@ -74,6 +74,7 @@ export function LuxuryProductSlider({
             fill
             className="object-cover"
             priority={priority}
+            loading={priority ? undefined : "lazy"}
             quality={quality}
             sizes={sizes}
           />

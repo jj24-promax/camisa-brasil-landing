@@ -4,6 +4,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { SectionReveal, SectionShell } from "@/components/landing/section-shell";
 import { ArrowRight, TicketPercent } from "lucide-react";
+import { PurchaseTrustBlock } from "@/components/landing/purchase-trust-block";
 
 type PromoBundleProps = {
   onBuyBundle: () => void;
@@ -29,11 +30,12 @@ export function PromoBundle({ onBuyBundle }: PromoBundleProps) {
             <p className="mt-4 text-sm leading-relaxed text-muted-foreground/85">
               Promoção não cumulativa: o benefício de uma peça isenta aplica-se uma única vez por pedido, independentemente da quantidade.
             </p>
-            <div className="mt-8">
+            <div className="mt-8 space-y-0">
               <Button size="xl" onClick={onBuyBundle} className="shimmer-btn w-full md:w-auto px-12">
                 <ArrowRight className="mr-2.5 h-5 w-5" />
                 Aproveitar Oferta
               </Button>
+              <PurchaseTrustBlock variant="compact" className="mt-6 max-w-md mx-auto md:mx-0" />
             </div>
           </div>
 
@@ -44,7 +46,7 @@ export function PromoBundle({ onBuyBundle }: PromoBundleProps) {
               fill
               className="object-cover"
               sizes="(max-width: 768px) 100vw, 800px"
-              priority
+              loading="lazy"
             />
           </div>
         </SectionReveal>

@@ -144,6 +144,7 @@ export function PremiumGallery() {
                   className="object-cover object-center"
                   sizes="(max-width: 1024px) 100vw, 72vw"
                   priority={active === 0}
+                  loading={active === 0 ? undefined : "lazy"}
                 />
               )}
             </motion.div>
@@ -196,6 +197,7 @@ export function PremiumGallery() {
                     fill
                     className="object-contain object-center"
                     sizes="(max-width: 1280px) 96vw, 1200px"
+                    loading="lazy"
                   />
                 </div>
               )}
@@ -231,6 +233,7 @@ export function PremiumGallery() {
                 fill
                 className="object-cover"
                 sizes="96px"
+                loading={i === 0 ? undefined : "lazy"}
               />
             </button>
           ))}

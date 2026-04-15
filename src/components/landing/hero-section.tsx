@@ -5,6 +5,7 @@ import { useRef } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { TrustBadges } from "./trust-badges";
+import { PurchaseTrustBlock } from "./purchase-trust-block";
 import { PRODUCT, SIZES, HERO_PRODUCT_SLIDES } from "@/lib/product";
 import type { Size } from "@/lib/types";
 import { useMobileParallaxOff } from "@/hooks/use-is-mobile-parallax";
@@ -64,6 +65,7 @@ export function HeroSection({
               fill
               className="object-contain"
               priority
+              sizes="(max-width: 768px) 100vw, 950px"
             />
           </div>
         </motion.div>
@@ -163,6 +165,8 @@ export function HeroSection({
                     <ArrowRight className="mr-3 h-5 w-5 shrink-0" />
                     Garantir minha Edição Sagrada
                   </Button>
+
+                  <PurchaseTrustBlock variant="hero" />
                 </div>
                 
                 <TrustBadges />

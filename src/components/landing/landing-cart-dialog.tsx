@@ -17,6 +17,7 @@ import { serializeOrderSizes } from "@/lib/cart-sizes";
 import { leve3Pague2DiscountCents } from "@/lib/offer-pricing";
 import { useCheckoutTransition } from "@/components/navigation/checkout-transition-provider";
 import { cn } from "@/lib/utils";
+import { PurchaseTrustBlock } from "@/components/landing/purchase-trust-block";
 
 type LandingCartDialogProps = {
   open: boolean;
@@ -106,6 +107,7 @@ export function LandingCartDialog({
                     fill
                     className="object-cover"
                     sizes="140px"
+                    loading="lazy"
                   />
                 </div>
                 <div className="min-w-0 flex-1 space-y-4">
@@ -205,6 +207,7 @@ export function LandingCartDialog({
             >
               Ir para o checkout
             </Button>
+            <PurchaseTrustBlock variant="compact" className="mt-4 px-0" />
           </div>
         </div>
       </DialogContent>

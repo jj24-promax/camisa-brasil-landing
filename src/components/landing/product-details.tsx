@@ -61,6 +61,7 @@ export function ProductDetails() {
                 fill
                 className="object-cover grayscale transition-all duration-700 group-hover:scale-110 group-hover:grayscale-0"
                 sizes="(max-width: 1024px) 100vw, 420px"
+                loading="lazy"
               />
               <div className="absolute bottom-8 left-8 right-8 z-20">
                 <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-gold-bright">Zoom no Detalhe</p>

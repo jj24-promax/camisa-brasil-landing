@@ -38,6 +38,7 @@ function UpsellCardContent() {
             fill
             className="z-0 object-cover object-center opacity-30"
             sizes="(max-width: 768px) 100vw, 480px"
+            loading="lazy"
           />
           <div className="absolute inset-0 z-[1] bg-gradient-to-t from-[#04070d] via-[#04070d]/75 to-gold/15" />
           <div className="absolute inset-0 z-[2] flex flex-col items-center justify-center gap-5 p-8">

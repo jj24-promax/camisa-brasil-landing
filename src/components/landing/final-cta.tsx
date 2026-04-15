@@ -5,6 +5,7 @@ import { PRODUCT } from "@/lib/product";
 import { ParallaxBg } from "@/components/landing/parallax-bg";
 import { SectionReveal, SectionShell } from "@/components/landing/section-shell";
 import { ArrowRight } from "lucide-react";
+import { PurchaseTrustBlock } from "@/components/landing/purchase-trust-block";
 
 type FinalCtaProps = {
   onBuyNow: () => void;
@@ -64,6 +65,8 @@ export function FinalCta({ onBuyNow }: FinalCtaProps) {
               Comprar agora
             </Button>
           </div>
+
+          <PurchaseTrustBlock variant="compact" className="mx-auto mt-10 max-w-xl" />
         </div>
       </SectionReveal>
     </SectionShell>

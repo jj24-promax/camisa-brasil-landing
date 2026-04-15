@@ -22,6 +22,8 @@ const nextConfig: NextConfig = {
   /** Evita confusão de raiz quando existe outro lockfile na pasta pai (ex.: Camisa V2). */
   outputFileTracingRoot: path.join(__dirname),
   images: {
+    /** Entrega WebP via otimizador do Next (melhor em 4G); fontes podem ser PNG. */
+    formats: ["image/webp"],
     // Configura as qualidades permitidas para evitar avisos de versões futuras do Next.js
     qualities: [75, 90, 95],
     remotePatterns: [
