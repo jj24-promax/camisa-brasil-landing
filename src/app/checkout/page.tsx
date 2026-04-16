@@ -216,8 +216,15 @@ function CheckoutContent() {
   const [paymentMethod, setPaymentMethod] = useState<"pix" | "card">("pix");
   const [selectedBumps, setSelectedBumps] = useState<string[]>([]);
   const [timeLeft, setTimeLeft] = useState(899); // 14:59
-  
-  /** Nome e número por camisa (índice alinhado a `quantity` e `orderSizes`). */
+
+  /** Secção de personalização paga aberta (não implica cobrança até marcar camisas). */
+  const [personalizationMaster, setPersonalizationMaster] = useState(false);
+  /** Personalização paga por camisa do pedido principal (índices 0..quantity-1). */
+  const [shirtPaidPersonalization, setShirtPaidPersonalization] = useState<boolean[]>([false]);
+  /** Nome/número grátis só na camisa extra da promo "Leve a 2ª" (índice = `quantity` em `customNames`). Não cumulativo com paga. */
+  const [giftFreePersonalization, setGiftFreePersonalization] = useState(false);
+
+  /** Nome e número: slots = camisas do pedido + 1 se promo presente ativa. */
   const [customNames, setCustomNames] = useState<string[]>([""]);
   const [customNumbers, setCustomNumbers] = useState<string[]>([""]);
 
@@ -270,14 +277,32 @@ function CheckoutContent() {
     return () => clearInterval(timer);
   }, []);
 
+  const hasSecondShirtBump = selectedBumps.includes("second_shirt");
+  const personalizationSlots = quantity + (hasSecondShirtBump ? 1 : 0);
+
   useEffect(() => {
-    setCustomNames((prev) =>
-      Array.from({ length: quantity }, (_, i) => prev[i] ?? "")
-    );
-    setCustomNumbers((prev) =>
-      Array.from({ length: quantity }, (_, i) => prev[i] ?? "")
+    setShirtPaidPersonalization((prev) =>
+      Array.from({ length: quantity }, (_, i) => prev[i] ?? false)
     );
   }, [quantity]);
+
+  useEffect(() => {
+    if (!hasSecondShirtBump) setGiftFreePersonalization(false);
+  }, [hasSecondShirtBump]);
+
+  useEffect(() => {
+    setCustomNames((prev) =>
+      Array.from({ length: personalizationSlots }, (_, i) => prev[i] ?? "")
+    );
+    setCustomNumbers((prev) =>
+      Array.from({ length: personalizationSlots }, (_, i) => prev[i] ?? "")
+    );
+  }, [quantity, personalizationSlots]);
+
+  /** Personalização deixou de ser um bump no carrinho — só por camisa. */
+  useEffect(() => {
+    setSelectedBumps((prev) => prev.filter((id) => id !== "personalization"));
+  }, []);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -286,7 +311,29 @@ function CheckoutContent() {
   };
   
   const toggleBump = (id: string) => {
-    setSelectedBumps(prev => prev.includes(id) ? prev.filter(b => b !== id) : [...prev, id]);
+    setSelectedBumps((prev) =>
+      prev.includes(id) ? prev.filter((b) => b !== id) : [...prev, id]
+    );
+  };
+
+  const personalizationBump = ORDER_BUMPS.find((b) => b.id === "personalization")!;
+
+  const togglePersonalizationMaster = () => {
+    setPersonalizationMaster((m) => {
+      if (m) {
+        setShirtPaidPersonalization(Array(quantity).fill(false));
+        return false;
+      }
+      return true;
+    });
+  };
+
+  const toggleShirtPaidPersonalization = (shirtIndex: number) => {
+    setShirtPaidPersonalization((prev) => {
+      const next = [...prev];
+      next[shirtIndex] = !next[shirtIndex];
+      return next;
+    });
   };
 
   /** Voltar do navegador: 1× por sessão → `/checkout/retencao` (lógica em `useCheckoutBrowserBackRetention`). */
@@ -296,24 +343,40 @@ function CheckoutContent() {
     const unitPrice = PRODUCT.priceCents;
     const subtotal = unitPrice * quantity;
     const itemDiscount = leve3Pague2DiscountCents(quantity, unitPrice);
-    const bumpsTotal = selectedBumps.reduce((sum, id) => {
-      const b = ORDER_BUMPS.find((x) => x.id === id);
-      if (!b) return sum;
-      if (id === "personalization") return sum + b.priceCents * quantity;
-      return sum + b.priceCents;
-    }, 0);
+    const paidPersonalizationLines = personalizationMaster
+      ? shirtPaidPersonalization.filter(Boolean).length
+      : 0;
+    const personalizationCents = paidPersonalizationLines * personalizationBump.priceCents;
+
+    const bumpsTotal =
+      selectedBumps.reduce((sum, id) => {
+        const b = ORDER_BUMPS.find((x) => x.id === id);
+        if (!b) return sum;
+        if (id === "personalization") return sum;
+        return sum + b.priceCents;
+      }, 0) + personalizationCents;
+
     const baseTotalCents = subtotal - itemDiscount + bumpsTotal;
-    const format = (cents: number) => new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(cents / 100);
+    const format = (cents: number) =>
+      new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(cents / 100);
 
     return {
       subtotal,
       discount: format(itemDiscount),
       discountValue: itemDiscount,
       bumpsTotal,
+      personalizationCents,
+      paidPersonalizationLines,
       baseTotalCents,
       quantity,
     };
-  }, [quantity, selectedBumps]);
+  }, [
+    quantity,
+    selectedBumps,
+    shirtPaidPersonalization,
+    personalizationMaster,
+    personalizationBump.priceCents,
+  ]);
 
   const retention = useRetentionDiscountOnTotal(pricing.baseTotalCents);
   const finalTotalCents = pricing.baseTotalCents - retention.discountCents;
@@ -412,12 +475,36 @@ function CheckoutContent() {
   };
 
   const handleFinalize = async () => {
-    if (selectedBumps.includes("personalization")) {
-      const incomplete = customNames.some(
-        (n, i) => !n.trim() || !(customNumbers[i] ?? "").trim()
-      );
-      if (incomplete) {
-        toast.error("Preencha o nome e o número em todas as camisas com personalização.");
+    if (personalizationMaster) {
+      const paidLines = shirtPaidPersonalization.filter(Boolean).length;
+      if (paidLines === 0) {
+        toast.error(
+          "Selecione pelo menos uma camisa para personalização paga ou desligue o extra de personalização."
+        );
+        return;
+      }
+    }
+
+    for (let i = 0; i < quantity; i++) {
+      if (!personalizationMaster || !shirtPaidPersonalization[i]) continue;
+      const n = (customNames[i] ?? "").trim();
+      const num = (customNumbers[i] ?? "").trim();
+      if (!n || !num) {
+        toast.error(
+          `Preencha nome e número na camisa ${i + 1} (personalização paga marcada).`
+        );
+        return;
+      }
+    }
+
+    if (hasSecondShirtBump && giftFreePersonalization) {
+      const gi = quantity;
+      const n = (customNames[gi] ?? "").trim();
+      const num = (customNumbers[gi] ?? "").trim();
+      if (!n || !num) {
+        toast.error(
+          "Preencha nome e número na camisa do presente (personalização grátis da promoção)."
+        );
         return;
       }
     }
@@ -919,19 +1006,41 @@ function CheckoutContent() {
                 <SectionHeader number={4} title="Adicione ao seu Pedido" />
                 <div className="grid gap-4">
                   {ORDER_BUMPS.map((bump) => {
-                    const isSelected = selectedBumps.includes(bump.id);
                     const isPersonalization = bump.id === "personalization";
+                    const isSecondShirt = bump.id === "second_shirt";
+                    const isBumpSelected = isPersonalization
+                      ? personalizationMaster
+                      : selectedBumps.includes(bump.id);
+
+                    const fmtBrl = (cents: number) =>
+                      new Intl.NumberFormat("pt-BR", {
+                        style: "currency",
+                        currency: "BRL",
+                      }).format(cents / 100);
+
+                    const personalizationPriceLabel = isPersonalization
+                      ? pricing.paidPersonalizationLines > 0
+                        ? `+ ${fmtBrl(pricing.personalizationCents)}`
+                        : `+ ${fmtBrl(bump.priceCents)} / camisa`
+                      : `+ ${fmtBrl(bump.priceCents)}`;
 
                     return (
-                      <div 
-                        key={bump.id} 
+                      <div
+                        key={bump.id}
                         className={cn(
-                          "group flex flex-col overflow-hidden rounded-2xl border transition-all", 
-                          isSelected ? "border-gold/60 bg-gold/5 ring-1 ring-gold/40 shadow-gold/5" : "border-white/5 bg-white/[0.02] hover:bg-white/[0.04]"
+                          "group flex flex-col overflow-hidden rounded-2xl border transition-all",
+                          isBumpSelected
+                            ? "border-gold/60 bg-gold/5 ring-1 ring-gold/40 shadow-gold/5"
+                            : "border-white/5 bg-white/[0.02] hover:bg-white/[0.04]"
                         )}
                       >
-                        <button 
-                          onClick={() => toggleBump(bump.id)} 
+                        <button
+                          type="button"
+                          onClick={() =>
+                            isPersonalization
+                              ? togglePersonalizationMaster()
+                              : toggleBump(bump.id)
+                          }
                           className="flex w-full min-w-0 items-center gap-4 p-4 text-left"
                         >
                           <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl border border-white/10">
@@ -951,42 +1060,165 @@ function CheckoutContent() {
                             </p>
                           </div>
                           <div className="shrink-0 text-right">
-                            <p className="text-[10px] font-bold text-gold-bright uppercase">
-                              {bump.id === "personalization" && quantity > 1
-                                ? `+ ${new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(bump.priceCents / 100)} × ${quantity}`
-                                : `+ ${new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(bump.priceCents / 100)}`}
+                            <p className="text-[10px] font-bold uppercase text-gold-bright">
+                              {personalizationPriceLabel}
                             </p>
-                            <div className={cn(
-                              "ml-auto mt-2 flex h-5 w-5 items-center justify-center rounded border", 
-                              isSelected ? "bg-gold border-gold" : "border-white/10"
-                            )}>
-                              {isSelected && <Check size={12} className="text-navy-deep font-bold" />}
+                            <div
+                              className={cn(
+                                "ml-auto mt-2 flex h-5 w-5 items-center justify-center rounded border",
+                                isBumpSelected ? "border-gold bg-gold" : "border-white/10"
+                              )}
+                            >
+                              {isBumpSelected && (
+                                <Check size={12} className="font-bold text-navy-deep" />
+                              )}
                             </div>
                           </div>
                         </button>
 
-                        {/* Campos de Input para Personalização */}
-                        {isPersonalization && isSelected && (
+                        {isPersonalization && personalizationMaster && (
                           <div className="space-y-4 border-t border-white/5 bg-white/[0.02] p-5">
-                            {quantity > 1 && (
-                              <p className="text-[11px] leading-relaxed text-muted-foreground">
-                                Uma personalização por camisa ({quantity} campos). Tamanho de cada peça indicado abaixo.
-                              </p>
-                            )}
+                            <p className="text-[11px] leading-relaxed text-muted-foreground">
+                              Marque em quais camisas do pedido quer nome e número nas costas. Só paga{" "}
+                              <span className="text-gold/90">{fmtBrl(personalizationBump.priceCents)}</span> por
+                              camisa selecionada — pode deixar alguma sem personalização.
+                            </p>
                             {Array.from({ length: quantity }, (_, shirtIndex) => (
                               <div
                                 key={shirtIndex}
                                 className="rounded-xl border border-white/[0.06] bg-[#060a12]/80 p-4"
                               >
+                                <button
+                                  type="button"
+                                  onClick={() => toggleShirtPaidPersonalization(shirtIndex)}
+                                  className="mb-3 flex w-full items-center gap-3 text-left"
+                                >
+                                  <span
+                                    className={cn(
+                                      "flex h-5 w-5 shrink-0 items-center justify-center rounded border transition-colors",
+                                      shirtPaidPersonalization[shirtIndex]
+                                        ? "border-gold bg-gold"
+                                        : "border-white/15 bg-transparent hover:border-white/25"
+                                    )}
+                                  >
+                                    {shirtPaidPersonalization[shirtIndex] ? (
+                                      <Check size={12} className="text-navy-deep" />
+                                    ) : null}
+                                  </span>
+                                  <span className="text-[11px] font-semibold leading-snug text-white">
+                                    Personalização paga nesta camisa
+                                    <span className="ml-1.5 text-gold/85">
+                                      (+ {fmtBrl(personalizationBump.priceCents)})
+                                    </span>
+                                  </span>
+                                </button>
                                 <p className="mb-3 text-[10px] font-bold uppercase tracking-widest text-gold/90">
                                   Camisa {shirtIndex + 1}
                                   {orderSizes[shirtIndex] ? (
-                                    <span className="ml-2 text-muted-foreground">· Tam. {orderSizes[shirtIndex]}</span>
+                                    <span className="ml-2 font-normal text-muted-foreground">
+                                      · Tam. {orderSizes[shirtIndex]}
+                                    </span>
                                   ) : null}
+                                </p>
+                                {shirtPaidPersonalization[shirtIndex] ? (
+                                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                    <div className="flex flex-col gap-1.5">
+                                      <label className="pl-1 text-[9px] font-bold uppercase tracking-widest text-gold/70">
+                                        Nome na camisa
+                                      </label>
+                                      <div className="relative">
+                                        <UserIcon className="absolute left-3.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-gold/40" />
+                                        <input
+                                          type="text"
+                                          placeholder="Ex: NEYMAR JR"
+                                          value={customNames[shirtIndex] ?? ""}
+                                          onChange={(e) => {
+                                            const v = e.target.value.toUpperCase();
+                                            setCustomNames((prev) => {
+                                              const next = [...prev];
+                                              next[shirtIndex] = v;
+                                              return next;
+                                            });
+                                          }}
+                                          className="h-10 w-full rounded-lg border border-gold/20 bg-[#060a12] pl-10 pr-4 text-xs font-bold text-white placeholder:text-muted-foreground/30 focus:border-gold/50 focus:outline-none focus:ring-1 focus:ring-gold/50"
+                                        />
+                                      </div>
+                                    </div>
+                                    <div className="flex flex-col gap-1.5">
+                                      <label className="pl-1 text-[9px] font-bold uppercase tracking-widest text-gold/70">
+                                        Número
+                                      </label>
+                                      <div className="relative">
+                                        <Hash className="absolute left-3.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-gold/40" />
+                                        <input
+                                          type="text"
+                                          placeholder="Ex: 10"
+                                          maxLength={2}
+                                          value={customNumbers[shirtIndex] ?? ""}
+                                          onChange={(e) => {
+                                            const v = e.target.value.replace(/\D/g, "").slice(0, 2);
+                                            setCustomNumbers((prev) => {
+                                              const next = [...prev];
+                                              next[shirtIndex] = v;
+                                              return next;
+                                            });
+                                          }}
+                                          className="h-10 w-full rounded-lg border border-gold/20 bg-[#060a12] pl-10 pr-4 text-xs font-bold text-white placeholder:text-muted-foreground/30 focus:border-gold/50 focus:outline-none focus:ring-1 focus:ring-gold/50"
+                                        />
+                                      </div>
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <p className="text-[10px] text-muted-foreground/80">
+                                    Sem personalização nesta unidade — sem custo adicional.
+                                  </p>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
+                        {isSecondShirt && selectedBumps.includes("second_shirt") && (
+                          <div className="space-y-4 border-t border-white/5 bg-white/[0.02] p-5">
+                            <button
+                              type="button"
+                              onClick={() => setGiftFreePersonalization((v) => !v)}
+                              className="flex w-full items-start gap-3 rounded-xl text-left"
+                            >
+                              <span
+                                className={cn(
+                                  "mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded border transition-colors",
+                                  giftFreePersonalization
+                                    ? "border-gold bg-gold"
+                                    : "border-white/15 hover:border-white/25"
+                                )}
+                              >
+                                {giftFreePersonalization ? (
+                                  <Check size={12} className="text-navy-deep" />
+                                ) : null}
+                              </span>
+                              <span className="min-w-0 flex-1">
+                                <span className="text-[12px] font-semibold text-white">
+                                  Nome e número grátis na camisa do presente
+                                </span>
+                                <span className="mt-1 block text-[11px] leading-relaxed text-muted-foreground">
+                                  Exclusivo desta promoção — não cumulativo com a personalização paga das outras
+                                  camisas (é outra peça).
+                                </span>
+                              </span>
+                              <span className="shrink-0 text-[10px] font-bold uppercase text-emerald-400/95">
+                                Grátis
+                              </span>
+                            </button>
+
+                            {giftFreePersonalization && (
+                              <div className="rounded-xl border border-emerald-500/20 bg-[#060a12]/80 p-4">
+                                <p className="mb-3 text-[10px] font-bold uppercase tracking-widest text-emerald-400/90">
+                                  Camisa do presente (promoção)
                                 </p>
                                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                   <div className="flex flex-col gap-1.5">
-                                    <label className="text-[9px] font-bold uppercase tracking-widest text-gold/70 pl-1">
+                                    <label className="pl-1 text-[9px] font-bold uppercase tracking-widest text-gold/70">
                                       Nome na camisa
                                     </label>
                                     <div className="relative">
@@ -994,21 +1226,21 @@ function CheckoutContent() {
                                       <input
                                         type="text"
                                         placeholder="Ex: NEYMAR JR"
-                                        value={customNames[shirtIndex] ?? ""}
+                                        value={customNames[quantity] ?? ""}
                                         onChange={(e) => {
                                           const v = e.target.value.toUpperCase();
                                           setCustomNames((prev) => {
                                             const next = [...prev];
-                                            next[shirtIndex] = v;
+                                            next[quantity] = v;
                                             return next;
                                           });
                                         }}
-                                        className="h-10 w-full rounded-lg border border-gold/20 bg-[#060a12] pl-10 pr-4 text-xs font-bold text-white placeholder:text-muted-foreground/30 focus:border-gold/50 focus:outline-none focus:ring-1 focus:ring-gold/50"
+                                        className="h-10 w-full rounded-lg border border-emerald-500/25 bg-[#060a12] pl-10 pr-4 text-xs font-bold text-white placeholder:text-muted-foreground/30 focus:border-emerald-500/45 focus:outline-none focus:ring-1 focus:ring-emerald-500/35"
                                       />
                                     </div>
                                   </div>
                                   <div className="flex flex-col gap-1.5">
-                                    <label className="text-[9px] font-bold uppercase tracking-widest text-gold/70 pl-1">
+                                    <label className="pl-1 text-[9px] font-bold uppercase tracking-widest text-gold/70">
                                       Número
                                     </label>
                                     <div className="relative">
@@ -1017,22 +1249,22 @@ function CheckoutContent() {
                                         type="text"
                                         placeholder="Ex: 10"
                                         maxLength={2}
-                                        value={customNumbers[shirtIndex] ?? ""}
+                                        value={customNumbers[quantity] ?? ""}
                                         onChange={(e) => {
                                           const v = e.target.value.replace(/\D/g, "").slice(0, 2);
                                           setCustomNumbers((prev) => {
                                             const next = [...prev];
-                                            next[shirtIndex] = v;
+                                            next[quantity] = v;
                                             return next;
                                           });
                                         }}
-                                        className="h-10 w-full rounded-lg border border-gold/20 bg-[#060a12] pl-10 pr-4 text-xs font-bold text-white placeholder:text-muted-foreground/30 focus:border-gold/50 focus:outline-none focus:ring-1 focus:ring-gold/50"
+                                        className="h-10 w-full rounded-lg border border-emerald-500/25 bg-[#060a12] pl-10 pr-4 text-xs font-bold text-white placeholder:text-muted-foreground/30 focus:border-emerald-500/45 focus:outline-none focus:ring-1 focus:ring-emerald-500/35"
                                       />
                                     </div>
                                   </div>
                                 </div>
                               </div>
-                            ))}
+                            )}
                           </div>
                         )}
                       </div>
@@ -1080,7 +1312,7 @@ function CheckoutContent() {
                     <span className="shrink-0 tabular-nums">- {pricing.discount}</span>
                   </div>
                 )}
-                {selectedBumps.length > 0 && (
+                {pricing.bumpsTotal > 0 && (
                   <div className="flex min-w-0 justify-between gap-3 text-sm font-bold text-gold">
                     <span className="min-w-0 shrink">Adicionais</span>
                     <span className="shrink-0 tabular-nums">

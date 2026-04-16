@@ -289,7 +289,7 @@ function ReviewMarquee({
 }) {
   return (
     <div
-      className="group relative w-full overflow-hidden"
+      className="relative w-full overflow-hidden"
       style={{
         maskImage: "linear-gradient(to right, transparent, black 10%, black 90%, transparent)",
         WebkitMaskImage:
@@ -298,7 +298,7 @@ function ReviewMarquee({
     >
       <div
         className={cn(
-          "flex min-w-max gap-6 group-hover:[animation-play-state:paused] md:gap-8",
+          "flex min-w-max gap-6 md:gap-8",
           reverse ? "animate-scroll-x-reverse" : "animate-scroll-x"
         )}
       >

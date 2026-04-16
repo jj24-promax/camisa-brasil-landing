@@ -42,7 +42,7 @@ export const HERO_PRODUCT_IMAGE_SRC = HERO_PRODUCT_POSTER_SRC;
 export const PRODUCT_IMAGE_MAIN_SRC =
   "/images/camisa-brasil-edicao-elite.png" as const;
 
-/** Arte 1 web — close frontal nº 10, CBF e Cristo no Jacquard (`GALLERY_IMAGES`[2] e 3.ª miniatura da galeria premium). */
+/** Arte 1 web — close frontal nº 10, CBF e Cristo no Jacquard (`GALLERY_IMAGES`[2]). */
 export const PRODUCT_IMAGE_DETAIL_SRC =
   "/images/gallery-premium-frontal-detalhe.png" as const;
 
@@ -100,18 +100,30 @@ export const GALLERY_IMAGES = [
   },
 ] as const;
 
-/** Galeria premium: 1.ª frontal; 2.ª costas; 3.ª Arte 1 web (close frontal); 4.ª detalhe gola/costa; 5.ª Modelo Alpha (1). */
+/**
+ * Galeria premium — fotos reais do modelo (~4:5).
+ * Ordem: editorial frontal → 3/4 → detalhe tórax → sentado → costas.
+ */
 export const PREMIUM_GALLERY_IMAGES = [
-  GALLERY_IMAGES[0],
   {
-    src: PRODUCT_IMAGE_GALLERY_BACK_SRC,
-    alt: "Costas da camisa — NOME e número 10, estrelas e acabamento premium",
+    src: "/images/campaign/galeria-modelo-01.png",
+    alt: "Modelo veste a camisa Brasil Alpha — pose frontal com braços cruzados, escudo CBF, Cristo em jacquard e número 10",
   },
-  GALLERY_IMAGES[2],
-  GALLERY_IMAGES[3],
   {
-    src: PRODUCT_IMAGE_MODELO_ALPHA_1_SRC,
-    alt: "Modelo Alpha — composição com vistas frontal, costas e detalhes da camisa Brasil Alpha Brasil",
+    src: "/images/campaign/galeria-modelo-02.png",
+    alt: "Modelo com a camisa Brasil Alpha — enquadramento três quartos, destaque para caimento e detalhes dourados",
+  },
+  {
+    src: "/images/campaign/galeria-modelo-03.png",
+    alt: "Modelo veste a camisa Brasil Alpha — vista frontal com foco na textura, no Cristo Redentor em jacquard e no número 10",
+  },
+  {
+    src: "/images/campaign/galeria-modelo-04.png",
+    alt: "Modelo com a camisa Brasil Alpha — pose sentada, postura confiante e leitura clara da peça no corpo",
+  },
+  {
+    src: "/images/campaign/galeria-modelo-05.png",
+    alt: "Modelo de costas com a camisa Brasil Alpha — nome personalizado, número 10 e acabamento premium",
   },
 ] as const;
 
