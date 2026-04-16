@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { SectionReveal, SectionShell, SectionSplit } from "@/components/landing/section-shell";
 import {
   PRODUCT_IMAGE_ARTE_REDENCAO_BACK_SRC,
@@ -13,6 +13,7 @@ import {
   PRODUCT_VIDEO_ARTE_REDENCAO_FRONT_WEBM_SRC,
 } from "@/lib/product";
 import { SECTION_STAGGER } from "@/hooks/use-section-motion";
+import { useInlineMutedVideoAutoplay } from "@/hooks/use-inline-muted-video-autoplay";
 import { ChevronLeft, ChevronRight, ShieldCheck, Sparkles, Map, Heart } from "lucide-react";
 
 const benefits = [
@@ -27,6 +28,7 @@ export function ProductDetails() {
   const [videoFailedFront, setVideoFailedFront] = useState(false);
   const [videoFailedBack, setVideoFailedBack] = useState(false);
   const arteVideoRef = useRef<HTMLVideoElement | null>(null);
+  const artePointerUnlock = useRef(false);
 
   const activeVideoFailed =
     activeImage === "front" ? videoFailedFront : videoFailedBack;
@@ -48,17 +50,24 @@ export function ProductDetails() {
       ? "Modelo com camisa Brasil Alpha vista frontal"
       : "Modelo com camisa Brasil Alpha vista costas com nome e número 10";
 
+  useInlineMutedVideoAutoplay(arteVideoRef, {
+    enabled: !activeVideoFailed,
+    mediaKey: `${activeImage}-${activeVideoMp4Src}`,
+  });
+
   useEffect(() => {
-    if (activeVideoFailed) return;
-    const el = arteVideoRef.current;
-    if (!el) return;
-    const tryPlay = () => {
-      void el.play().catch(() => {});
-    };
-    if (el.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) tryPlay();
-    else el.addEventListener("loadeddata", tryPlay, { once: true });
-    return () => el.removeEventListener("loadeddata", tryPlay);
-  }, [activeImage, activeVideoFailed, activeVideoMp4Src, activeVideoWebmSrc]);
+    artePointerUnlock.current = false;
+  }, [activeImage]);
+
+  const onArtePointerDown = useCallback(() => {
+    if (artePointerUnlock.current) return;
+    artePointerUnlock.current = true;
+    const v = arteVideoRef.current;
+    if (!v) return;
+    v.muted = true;
+    v.volume = 0;
+    void v.play().catch(() => {});
+  }, []);
 
   return (
     <SectionShell id="detalhes" variant="default" grain="low" className="py-24 md:py-32">
@@ -98,7 +107,10 @@ export function ProductDetails() {
           </div>
 
           <SectionReveal className="lg:col-span-5 lg:col-start-8">
-            <div className="group relative mx-auto aspect-[3/4] max-w-[420px] overflow-hidden rounded-[3rem] shadow-luxe transition-all duration-700 hover:shadow-gold/20">
+            <div
+              className="group relative mx-auto aspect-[3/4] max-w-[420px] overflow-hidden rounded-[3rem] shadow-luxe transition-all duration-700 hover:shadow-gold/20"
+              onPointerDownCapture={onArtePointerDown}
+            >
               <div className="absolute inset-0 z-10 bg-gradient-to-t from-navy-deep/80 via-transparent to-transparent opacity-60 transition-opacity group-hover:opacity-40" />
               <AnimatePresence mode="wait">
                 <motion.div

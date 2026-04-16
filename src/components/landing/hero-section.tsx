@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { TrustBadges } from "./trust-badges";
@@ -9,6 +9,7 @@ import { PurchaseTrustBlock } from "./purchase-trust-block";
 import { PRODUCT, SIZES, HERO_PRODUCT_SLIDES } from "@/lib/product";
 import type { Size } from "@/lib/types";
 import { useMobileParallaxOff } from "@/hooks/use-is-mobile-parallax";
+import { useInlineMutedVideoAutoplay } from "@/hooks/use-inline-muted-video-autoplay";
 import { cn } from "@/lib/utils";
 import { ArrowRight, Star } from "lucide-react";
 
@@ -42,22 +43,23 @@ export function HeroSection({
 
   const heroVideoRef = useRef<HTMLVideoElement | null>(null);
   const [heroVideoFailed, setHeroVideoFailed] = useState(false);
+  const heroPointerUnlockDone = useRef(false);
 
-  /**
-   * iOS pode rejeitar a Promise de `play()` mesmo com muted+playsInline; o vídeo
-   * ainda arranca com o atributo autoPlay. Não marcar como falha nesse caso.
-   */
-  useEffect(() => {
-    if (heroVideoFailed) return;
-    const el = heroVideoRef.current;
-    if (!el) return;
-    const tryPlay = () => {
-      void el.play().catch(() => {});
-    };
-    if (el.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) tryPlay();
-    else el.addEventListener("loadeddata", tryPlay, { once: true });
-    return () => el.removeEventListener("loadeddata", tryPlay);
-  }, [heroVideoFailed, heroItem.mp4Src]);
+  useInlineMutedVideoAutoplay(heroVideoRef, {
+    enabled: !heroVideoFailed,
+    mediaKey: heroItem.mp4Src,
+  });
+
+  /** Primeiro toque na hero (gesto do utilizador) — iOS por vezes só aí liberta o loop. */
+  const onHeroPointerDown = useCallback(() => {
+    if (heroPointerUnlockDone.current) return;
+    heroPointerUnlockDone.current = true;
+    const v = heroVideoRef.current;
+    if (!v) return;
+    v.muted = true;
+    v.volume = 0;
+    void v.play().catch(() => {});
+  }, []);
 
   return (
     <section
@@ -65,6 +67,7 @@ export function HeroSection({
       ref={sectionRef}
       className="relative min-h-[100dvh] overflow-hidden bg-[#04070d]"
       aria-labelledby="hero-heading"
+      onPointerDownCapture={onHeroPointerDown}
     >
       <div className="relative z-10 mx-auto flex max-w-[1600px] flex-col items-center px-5 pb-20 pt-[6rem] md:px-10 md:pb-24 md:pt-28 xl:px-14">
         
