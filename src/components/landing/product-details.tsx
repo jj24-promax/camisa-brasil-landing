@@ -52,12 +52,8 @@ export function ProductDetails() {
     if (activeVideoFailed) return;
     const el = arteVideoRef.current;
     if (!el) return;
-    const side = activeImage;
     const tryPlay = () => {
-      void el.play().catch(() => {
-        if (side === "front") setVideoFailedFront(true);
-        else setVideoFailedBack(true);
-      });
+      void el.play().catch(() => {});
     };
     if (el.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) tryPlay();
     else el.addEventListener("loadeddata", tryPlay, { once: true });

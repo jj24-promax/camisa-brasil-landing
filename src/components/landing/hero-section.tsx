@@ -43,19 +43,21 @@ export function HeroSection({
   const heroVideoRef = useRef<HTMLVideoElement | null>(null);
   const [heroVideoFailed, setHeroVideoFailed] = useState(false);
 
+  /**
+   * iOS pode rejeitar a Promise de `play()` mesmo com muted+playsInline; o vídeo
+   * ainda arranca com o atributo autoPlay. Não marcar como falha nesse caso.
+   */
   useEffect(() => {
-    if (heroVideoFailed || reduced) return;
+    if (heroVideoFailed) return;
     const el = heroVideoRef.current;
     if (!el) return;
     const tryPlay = () => {
-      void el.play().catch(() => {
-        setHeroVideoFailed(true);
-      });
+      void el.play().catch(() => {});
     };
     if (el.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) tryPlay();
     else el.addEventListener("loadeddata", tryPlay, { once: true });
     return () => el.removeEventListener("loadeddata", tryPlay);
-  }, [heroVideoFailed, reduced, heroItem.mp4Src]);
+  }, [heroVideoFailed, heroItem.mp4Src]);
 
   return (
     <section
@@ -203,7 +205,7 @@ export function HeroSection({
                 transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
                 className="hero-product-frame relative aspect-[4/5] overflow-hidden rounded-[2.5rem] bg-navy-deep/40 backdrop-blur-sm"
               >
-                {reduced || heroVideoFailed ? (
+                {heroVideoFailed ? (
                   <Image
                     src={heroItem.posterSrc}
                     alt={heroItem.alt}
